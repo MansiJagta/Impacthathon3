@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import { C } from "../constants/theme";
-
-export default function UserActivity() {
-=======
 import { useState, useEffect } from "react";
 import { C } from "../constants/theme";
 import api from "../services/api";
@@ -30,7 +25,6 @@ export default function UserActivity() {
 
     if (loading) return <div style={{ color: C.muted, padding: 24 }}>Loading activity...</div>;
     if (error) return <div style={{ color: C.red, padding: 24 }}>Error: {error}</div>;
->>>>>>> f930c12 (update project before sync)
 
     return (
         <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
@@ -52,15 +46,6 @@ export default function UserActivity() {
                         </tr>
                     </thead>
                     <tbody>
-<<<<<<< HEAD
-                        <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                            <td style={tdStyle}>John Doe</td>
-                            <td style={tdStyle}>👤 Claimer</td>
-                            <td style={tdStyle}>24</td>
-                            <td style={{ ...tdStyle, color: C.green, fontWeight: 800 }}>83%</td>
-                            <td style={{ ...tdStyle, color: C.muted }}>2m ago</td>
-                        </tr>
-=======
                         {activities.length > 0 ? activities.map((u, i) => (
                             <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
                                 <td style={tdStyle}>{u.name}</td>
@@ -74,7 +59,6 @@ export default function UserActivity() {
                                 <td colSpan="5" style={{ padding: 40, textAlign: "center", color: C.muted }}>No user activity recorded.</td>
                             </tr>
                         )}
->>>>>>> f930c12 (update project before sync)
                     </tbody>
                 </table>
             </div>

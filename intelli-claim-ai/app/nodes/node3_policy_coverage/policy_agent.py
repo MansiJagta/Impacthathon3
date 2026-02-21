@@ -20,16 +20,25 @@ def extract_claim_context(node1_output):
         fields = doc.get("structured_fields", {})
         dtype = doc.get("document_type")
 
-        if dtype == "policy":
-            policy_number = fields.get("policy_number", [None])[0]
+        # Prioritize richer fields
+        if not policy_number:
+            res = fields.get("policy_number")
+            policy_number = res[0] if isinstance(res, list) and res else res
+            
+        if not incident_date:
+            res = fields.get("incident_date")
+            incident_date = res[0] if isinstance(res, list) and res else res
 
-        if dtype == "bill":
-            amt = fields.get("amount", [0])[0]
-            claim_amount = float(amt)
+        if not description:
+            description = fields.get("summary") or fields.get("description", "")
 
-        if dtype == "report":
-            incident_date = fields.get("incident_date", [None])[0]
-            description = fields.get("description", "")
+        if dtype == "bill" and claim_amount == 0:
+            res = fields.get("amount")
+            amt = res[0] if isinstance(res, list) and res else res
+            try:
+                claim_amount = float(amt or 0)
+            except (TypeError, ValueError):
+                pass
 
     if incident_date:
         incident_date = datetime.strptime(incident_date, "%d/%m/%Y")

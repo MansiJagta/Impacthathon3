@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-import { useState } from "react";
-import { C } from "../../constants/theme";
-
-export default function NewClaimForm() {
-    const [type, setType] = useState("Health");
-
-    const types = [
-        { id: "Health", icon: "🏥" },
-        { id: "Motor", icon: "🚗" },
-        { id: "Property", icon: "🏠" },
-    ];
-
-=======
 import { useState, useEffect, useRef } from "react";
 import { C } from "../../constants/theme";
 import FileUploader from "../../components/FileUploader";
@@ -114,7 +100,7 @@ export default function NewClaimForm() {
 
             const result = await api.submitClaim(data);
             alert("Claim submitted successfully! ID: " + result.claim_id);
-            navigate("/portal/claimer/history"); // Redirect to history after success
+            navigate(`/claim-details/${result.claim_id}`); // Show details immediately
         } catch (error) {
             console.error("Submission error:", error);
             alert("Failed to submit claim: " + error.message);
@@ -125,24 +111,16 @@ export default function NewClaimForm() {
 
     const currentConfig = insuranceConfig[type];
 
->>>>>>> f930c12 (update project before sync)
     return (
         <div>
             <div style={{ marginBottom: 40 }}>
                 <p style={{ color: C.muted, fontSize: 11, fontWeight: 800, textTransform: "uppercase", marginBottom: 16 }}>
-<<<<<<< HEAD
-                    Step 1: Select Insurance Type
-=======
                     Step 1: SELECT INSURANCE TYPE
->>>>>>> f930c12 (update project before sync)
                 </p>
                 <div style={{ display: "flex", gap: 12 }}>
                     {types.map(t => (
                         <button
                             key={t.id}
-<<<<<<< HEAD
-                            onClick={() => setType(t.id)}
-=======
                             onClick={() => {
                                 setType(t.id);
                                 setFormData({});
@@ -154,7 +132,6 @@ export default function NewClaimForm() {
                                     other: []
                                 });
                             }}
->>>>>>> f930c12 (update project before sync)
                             style={{
                                 background: type === t.id ? C.blue + "22" : C.panel,
                                 color: type === t.id ? C.blue : C.muted,
@@ -166,12 +143,8 @@ export default function NewClaimForm() {
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 8,
-<<<<<<< HEAD
-                                flex: 1
-=======
                                 flex: 1,
                                 transition: "all 0.2s ease"
->>>>>>> f930c12 (update project before sync)
                             }}
                         >
                             <span>{t.icon}</span> {t.id}
@@ -186,21 +159,14 @@ export default function NewClaimForm() {
                         <span>{types.find(t => t.id === type).icon}</span> {type.toUpperCase()} INSURANCE CLAIM FORM
                     </h3>
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-<<<<<<< HEAD
-                        {["Policy Number", "Patient Name", "Hospital Name", "Admission Date", "Discharge Date", "Claim Amount (₹)"].map(field => (
-=======
                         {currentConfig.fields.map(field => (
->>>>>>> f930c12 (update project before sync)
                             <div key={field}>
                                 <label style={{ display: "block", color: C.muted, fontSize: 11, fontWeight: 800, marginBottom: 8, textTransform: "uppercase" }}>{field}</label>
                                 <input
                                     type="text"
                                     placeholder={field}
-<<<<<<< HEAD
-=======
                                     value={formData[field] || ""}
                                     onChange={(e) => handleFieldChange(field, e.target.value)}
->>>>>>> f930c12 (update project before sync)
                                     style={{
                                         width: "100%",
                                         background: C.panel,
@@ -208,18 +174,12 @@ export default function NewClaimForm() {
                                         padding: "12px",
                                         borderRadius: 6,
                                         color: C.text,
-<<<<<<< HEAD
-                                        outline: "none"
-=======
                                         outline: "none",
                                         boxSizing: "border-box"
->>>>>>> f930c12 (update project before sync)
                                     }}
                                 />
                             </div>
                         ))}
-<<<<<<< HEAD
-=======
 
                         <div>
                             <label style={{ display: "block", color: C.muted, fontSize: 11, fontWeight: 800, marginBottom: 8, textTransform: "uppercase" }}>
@@ -244,7 +204,6 @@ export default function NewClaimForm() {
                                 }}
                             />
                         </div>
->>>>>>> f930c12 (update project before sync)
                     </div>
                 </div>
 
@@ -252,56 +211,6 @@ export default function NewClaimForm() {
                     <h3 style={{ color: C.text, display: "flex", alignItems: "center", gap: 12, marginBottom: 24, fontSize: 18 }}>
                         <span>📎</span> Required Documents
                     </h3>
-<<<<<<< HEAD
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                        {[
-                            { name: "Policy Document", icon: "📄", status: "Uploaded", color: C.green },
-                            { name: "Patient ID Proof", icon: "🆔", status: "Uploaded", color: C.green },
-                            { name: "Hospital Bill", icon: "🏥", status: "Pending", color: C.yellow },
-                            { name: "Discharge Summary", icon: "📄", status: "Pending", color: C.yellow },
-                        ].map((doc, i) => (
-                            <div key={i} style={{
-                                background: C.panel,
-                                padding: "16px",
-                                borderRadius: 8,
-                                border: `1px solid ${C.border}`,
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center"
-                            }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <span style={{
-                                        background: doc.name.includes("ID") ? "#a855f7" : C.text,
-                                        color: "#000",
-                                        width: 24,
-                                        height: 24,
-                                        borderRadius: 4,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontSize: 12
-                                    }}>{doc.icon}</span>
-                                    <span style={{ color: C.text, fontSize: 13, fontWeight: 700 }}>{doc.name}</span>
-                                </div>
-                                <div style={{ color: doc.color, fontSize: 11, fontWeight: 800 }}>
-                                    {doc.status === "Uploaded" ? "✓ Uploaded" : "⏳ Pending"}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div style={{ display: "flex", gap: 16, marginTop: 32 }}>
-                        <button style={{
-                            flex: 1,
-                            background: C.blue,
-                            color: "#fff",
-                            border: "none",
-                            padding: "16px",
-                            borderRadius: 8,
-                            fontWeight: 800,
-                            cursor: "pointer"
-                        }}>Submit Claim</button>
-=======
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                         {currentConfig.docs.map((doc) => (
                             <FileUploader
@@ -319,11 +228,10 @@ export default function NewClaimForm() {
                             onFilesChange={(files) => handleFilesChange("other", files)}
                         />
                     </div>
-
-                    <div style={{ display: "flex", gap: 16, marginTop: 32 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                         <button
-                            disabled={isSubmitting}
                             onClick={handleSubmit}
+                            disabled={isSubmitting}
                             style={{
                                 flex: 1,
                                 background: C.blue,
@@ -333,12 +241,12 @@ export default function NewClaimForm() {
                                 borderRadius: 8,
                                 fontWeight: 800,
                                 cursor: isSubmitting ? "not-allowed" : "pointer",
-                                opacity: isSubmitting ? 0.7 : 1
+                                opacity: isSubmitting ? 0.7 : 1,
+                                boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)"
                             }}
                         >
-                            {isSubmitting ? "Submitting..." : "Submit Claim"}
+                            {isSubmitting ? "Processing Claim..." : "🚀 Submit Claim for AI Review"}
                         </button>
->>>>>>> f930c12 (update project before sync)
                         <button style={{
                             flex: 1,
                             background: C.panel,

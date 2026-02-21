@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-import { C } from "../../constants/theme";
-import { Badge } from "../../components/Badge";
-=======
 import { useState, useEffect } from "react";
 import { C } from "../../constants/theme";
 import { Badge } from "../../components/Badge";
 import api from "../../services/api";
->>>>>>> f930c12 (update project before sync)
 
 const StatCard = ({ label, value, color }) => (
     <div style={{
@@ -23,13 +18,6 @@ const StatCard = ({ label, value, color }) => (
 );
 
 export default function ClaimerDashboard({ onNew, onHistory }) {
-<<<<<<< HEAD
-    const recentClaims = [
-        { id: "CL-2024-0891", type: "Motor", amount: "₹75,000", status: "Auto-approved", date: "2m ago", badge: "Approved" },
-        { id: "CL-2024-0890", type: "Health", amount: "₹1,20,000", status: "Under review by underwriter", date: "1h ago", badge: "Pending" },
-        { id: "CL-2024-0889", type: "Property", amount: "₹5,00,000", status: "Documents flagged as suspicious", date: "3h ago", badge: "Flagged" },
-    ];
-=======
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -69,22 +57,14 @@ export default function ClaimerDashboard({ onNew, onHistory }) {
         if (diffHours < 24) return `${diffHours}h ago`;
         return `${diffDays}d ago`;
     };
->>>>>>> f930c12 (update project before sync)
 
     return (
         <div>
             <div style={{ display: "flex", gap: 20, marginBottom: 32 }}>
-<<<<<<< HEAD
-                <StatCard label="Total" value="12" color={C.blue} />
-                <StatCard label="Approved" value="8" color={C.green} />
-                <StatCard label="Pending" value="2" color={C.yellow} />
-                <StatCard label="Flagged" value="2" color={C.red} />
-=======
                 <StatCard label="Total" value={stats.total} color={C.blue} />
                 <StatCard label="Approved" value={stats.approved} color={C.green} />
                 <StatCard label="Pending" value={stats.pending} color={C.yellow} />
                 <StatCard label="Flagged" value={stats.flagged} color={C.red} />
->>>>>>> f930c12 (update project before sync)
             </div>
 
             <div style={{ display: "flex", gap: 16, marginBottom: 40 }}>
@@ -139,20 +119,6 @@ export default function ClaimerDashboard({ onNew, onHistory }) {
                 </div>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <tbody>
-<<<<<<< HEAD
-                        {recentClaims.map((c, i) => (
-                            <tr key={i} style={{ borderBottom: i === recentClaims.length - 1 ? "none" : `1px solid ${C.border}` }}>
-                                <td style={{ padding: "20px 24px", color: C.accent, fontWeight: 700, fontSize: 13 }}>{c.id}</td>
-                                <td style={{ padding: "20px 24px" }}>
-                                    <span style={{ background: C.dim, color: C.text, padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.type}</span>
-                                </td>
-                                <td style={{ padding: "20px 24px", color: C.text, fontWeight: 800 }}>{c.amount}</td>
-                                <td style={{ padding: "20px 24px", color: C.muted, fontSize: 12 }}>{c.status}</td>
-                                <td style={{ padding: "20px 24px" }}><Badge status={c.badge} /></td>
-                                <td style={{ padding: "20px 24px", color: C.muted, fontSize: 11, textAlign: "right" }}>{c.date}</td>
-                            </tr>
-                        ))}
-=======
                         {recent_claims.length === 0 ? (
                             <tr>
                                 <td colSpan="6" style={{ padding: "40px", textAlign: "center", color: C.muted }}>
@@ -173,14 +139,10 @@ export default function ClaimerDashboard({ onNew, onHistory }) {
                                 </tr>
                             ))
                         )}
->>>>>>> f930c12 (update project before sync)
                     </tbody>
                 </table>
             </div>
         </div>
     );
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> f930c12 (update project before sync)

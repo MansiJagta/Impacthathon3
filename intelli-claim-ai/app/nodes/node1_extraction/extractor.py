@@ -73,14 +73,32 @@ def process_documents(claim_id: str, file_paths: list[str]):
         doc_type = classify_document(text)
         fields = {}
 
-        if doc_type == "policy":
-            fields = extract_policy_fields(text)
-        elif doc_type == "bill":
-            fields = extract_bill_fields(text)
-        elif doc_type == "id_proof":
-            fields = extract_id_fields(text)
-        elif doc_type == "report":
-            fields = extract_report_fields(text)
+        # Use LLM for better extraction
+        from app.services.llm_service import llm_service
+        llm_data = llm_service.extract_structured_data(text, doc_type)
+        
+        if llm_data:
+            # Merge LLM data into fields, preserving legacy structure where expected
+            fields = {
+                "claimer_name": llm_data.get("claimer_name"),
+                "claimer_email": llm_data.get("claimer_email"),
+                "claimer_phone": llm_data.get("claimer_phone"),
+                "claimer_address": llm_data.get("claimer_address"),
+                "policy_number": [llm_data.get("policy_number")] if llm_data.get("policy_number") else [],
+                "amount": [llm_data.get("amount")] if llm_data.get("amount") else [],
+                "incident_date": [llm_data.get("date")] if llm_data.get("date") else [],
+                "summary": llm_data.get("summary"),
+            }
+        else:
+            # Fallback to regex
+            if doc_type == "policy":
+                fields = extract_policy_fields(text)
+            elif doc_type == "bill":
+                fields = extract_bill_fields(text)
+            elif doc_type == "id_proof":
+                fields = extract_id_fields(text)
+            elif doc_type == "report":
+                fields = extract_report_fields(text)
 
         documents.append({
             "file": path,

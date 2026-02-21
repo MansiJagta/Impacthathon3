@@ -7,12 +7,25 @@ import random
 def extract_claim_amount(node1_output):
     for doc in node1_output["documents"]:
         if doc["document_type"] == "bill":
-            amt = doc["structured_fields"].get("amount", [0])[0]
+            fields = doc.get("structured_fields", {})
+            raw_amt = fields.get("amount")
+            
+            # Handle list vs scalar from different extraction sources
+            if isinstance(raw_amt, list):
+                raw_amt = raw_amt[0] if raw_amt else 0
+            
+            if not raw_amt:
+                continue
+
             try:
-                return float(amt)
-            except:
-                return 0
-    return 0
+                if isinstance(raw_amt, str):
+                    # Remove non-numeric chars except decimal
+                    clean_amt = "".join(c for c in raw_amt if c.isdigit() or c == ".")
+                    return float(clean_amt) if clean_amt else 0.0
+                return float(raw_amt)
+            except (TypeError, ValueError):
+                return 0.0
+    return 0.0
 
 
 # --------------------------------

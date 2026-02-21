@@ -63,7 +63,11 @@ def _infer_claim_data_from_node1(node1_output: dict[str, Any]) -> dict[str, Any]
 		fields = doc.get("structured_fields", {}) if isinstance(doc, dict) else {}
 		doc_type = doc.get("document_type") if isinstance(doc, dict) else None
 
-		if doc_type == "policy" and not policy_number:
+		if not claimer_name:
+			claimer_name = fields.get("claimer_name")
+		if not claimer_address:
+			claimer_address = fields.get("claimer_address")
+		if not policy_number:
 			policy_number = _first(fields.get("policy_number"))
 
 		if doc_type == "bill" and claim_amount is None:
@@ -72,12 +76,6 @@ def _infer_claim_data_from_node1(node1_output: dict[str, Any]) -> dict[str, Any]
 				claim_amount = float(raw_amount) if raw_amount is not None else None
 			except (TypeError, ValueError):
 				claim_amount = None
-
-		if doc_type == "id_proof":
-			if not claimer_name:
-				claimer_name = _first(fields.get("name"))
-			if not claimer_address:
-				claimer_address = _first(fields.get("address"))
 
 	return {
 		"policy_number": policy_number,
@@ -182,8 +180,8 @@ def _build_reasoning(doc: dict[str, Any]) -> list[ClaimReasoningItem]:
 		),
 		ClaimReasoningItem(
 			node="Fraud Detection",
-			finding=", ".join(node4.get("fraud_indicators", [])) or "No major anomaly",
-			confidence=node4.get("fraud_score"),
+			finding=str(node4.get("reasoning") or (", ".join(node4.get("fraud_indicators", [])) or "No major anomaly")),
+			confidence=node4.get("confidence") or node4.get("fraud_score"),
 		),
 		ClaimReasoningItem(
 			node="Predictive Analysis",
@@ -264,18 +262,51 @@ async def submit_claim_with_upload(
 	resolved_claim_id = claim_id or _make_claim_id()
 	try:
 		final_state = run_claim_workflow(claim_id=resolved_claim_id, document_paths=saved_paths)
-	except Exception as exc:  # noqa: BLE001
-		raise HTTPException(status_code=500, detail=f"Claim workflow failed: {exc}") from exc
 
-	inferred = _infer_claim_data_from_node1(final_state.get("node1_output", {}))
-	final_policy_number = inferred.get("policy_number") or "UNKNOWN"
-	final_claim_amount = float(inferred.get("claim_amount") or 0.0)
-	final_claimer_name = claimer_name or inferred.get("claimer_name") or "Unknown Claimer"
-	final_claimer_address = claimer_address or inferred.get("claimer_address")
-	final_claimer_email = claimer_email or "unknown@example.com"
+		inferred = _infer_claim_data_from_node1(final_state.get("node1_output", {}))
+		final_policy_number = inferred.get("policy_number") or "UNKNOWN"
+		
+		# Robust float parsing
+		raw_amount = inferred.get("claim_amount")
+		final_claim_amount = 0.0
+		if raw_amount:
+			try:
+				# Remove non-numeric chars except decimal
+				if isinstance(raw_amount, str):
+					clean_amt = "".join(c for c in raw_amount if c.isdigit() or c == ".")
+					final_claim_amount = float(clean_amt) if clean_amt else 0.0
+				else:
+					final_claim_amount = float(raw_amount)
+			except (ValueError, TypeError):
+				final_claim_amount = 0.0
 
-	_persist_claim(
-		{
+		final_claimer_name = claimer_name or inferred.get("claimer_name") or "Unknown Claimer"
+		final_claimer_address = claimer_address or inferred.get("claimer_address")
+		final_claimer_email = claimer_email or "unknown@example.com"
+
+		_persist_claim(
+			{
+				"claim_type": claim_type,
+				"claim_amount": final_claim_amount,
+				"policy_number": final_policy_number,
+				"claimer": {
+					"name": final_claimer_name,
+					"email": final_claimer_email,
+					"phone": claimer_phone,
+					"address": final_claimer_address,
+				},
+				"form_data": {
+					"auto_extracted": True,
+					"node1_output": final_state.get("node1_output", {}),
+				},
+				"document_paths": saved_paths,
+			},
+			final_state,
+			resolved_claim_id,
+		)
+
+		response = _build_submit_response(resolved_claim_id, final_state)
+		response["extracted_claim_data"] = {
 			"claim_type": claim_type,
 			"claim_amount": final_claim_amount,
 			"policy_number": final_policy_number,
@@ -285,30 +316,14 @@ async def submit_claim_with_upload(
 				"phone": claimer_phone,
 				"address": final_claimer_address,
 			},
-			"form_data": {
-				"auto_extracted": True,
-				"node1_output": final_state.get("node1_output", {}),
-			},
 			"document_paths": saved_paths,
-		},
-		final_state,
-		resolved_claim_id,
-	)
-
-	response = _build_submit_response(resolved_claim_id, final_state)
-	response["extracted_claim_data"] = {
-		"claim_type": claim_type,
-		"claim_amount": final_claim_amount,
-		"policy_number": final_policy_number,
-		"claimer": {
-			"name": final_claimer_name,
-			"email": final_claimer_email,
-			"phone": claimer_phone,
-			"address": final_claimer_address,
-		},
-		"document_paths": saved_paths,
-	}
-	return response
+		}
+		return response
+	except Exception as exc:  # noqa: BLE001
+		import traceback
+		print(f"CRITICAL ERROR in submit-upload: {exc}")
+		traceback.print_exc()
+		raise HTTPException(status_code=500, detail=f"Claim processing error: {exc}") from exc
 
 
 @router.get("/dashboard/{claimer_email}", response_model=ClaimerDashboardResponse)
