@@ -18,8 +18,13 @@ def store_high_risk_claim(
 
         "coverage_decision": node3_output,
         "validation_result": node2_output,
+        
+        # New Metadata Tracking
+        "extracted_entities": node1_output.get("extracted_entities"),
+        "field_confidence": node1_output.get("field_confidence"),
+        "overall_confidence": node1_output.get("overall_confidence"),
 
-        "ai_explanation": explanation_output["explanation_text"],
+        "ai_explanation": explanation_output.get("explanation_text", ""),
 
         "created_at": datetime.utcnow(),
 
@@ -27,4 +32,4 @@ def store_high_risk_claim(
     }
 
     high_risk_claims_collection.insert_one(doc)
-    print("Stored claim in HITL database")
+    print(f"Stored claim {claim_id} in HITL database with reliability scores.")

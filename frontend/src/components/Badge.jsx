@@ -2,11 +2,11 @@ import { C } from "../constants/theme";
 
 export function Badge({ status }) {
     const map = {
-        Approved: { bg: "#064e3b", color: C.green, dot: C.green, label: "Approved" },
-        Pending: { bg: "#451a03", color: C.yellow, dot: C.yellow, label: "Pending" },
-        Rejected: { bg: "#450a0a", color: C.red, dot: C.red, label: "Rejected" },
-        Flagged: { bg: "#422006", color: "#f97316", dot: "#f97316", label: "Flagged" },
-        "Auto-approved": { bg: "#064e3b", color: C.green, dot: C.green, label: "Auto" },
+        Approved: { bg: "#DCFCE7", color: "#22c55e", dot: "#22c55e", label: "Approved" },
+        Pending: { bg: "#FEF3C7", color: "#CA8A04", dot: "#CA8A04", label: "Pending" },
+        Rejected: { bg: "#FEE2E2", color: "#ef4444", dot: "#ef4444", label: "Rejected" },
+        Flagged: { bg: "#FFEDD5", color: "#f97316", dot: "#f97316", label: "Flagged" },
+        "Auto-approved": { bg: "#DCFCE7", color: "#22c55e", dot: "#22c55e", label: "Auto" },
     };
     const s = map[status] || map.Pending;
     return (

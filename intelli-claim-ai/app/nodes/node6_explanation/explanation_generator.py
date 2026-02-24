@@ -1,60 +1,41 @@
 from datetime import datetime
 
 
-def generate_explanation(node2_output, node3_output, node4_output):
+def generate_explanation(node1_output, node2_output, node3_output, node4_output):
+    all_reasoning = []
+    
+    # Node 1 Reasoning
+    if node1_output and "reasoning" in node1_output:
+        all_reasoning.extend(node1_output["reasoning"])
+        
+    # Node 2 Reasoning
+    if node2_output and "reasoning" in node2_output:
+        all_reasoning.extend(node2_output["reasoning"])
+        
+    # Node 3 Reasoning (Policy)
+    if node3_output:
+        all_reasoning.append({
+            "node": "Policy Coverage",
+            "finding": node3_output.get("reason", "Policy check completed."),
+            "confidence": node3_output.get("policy_match_confidence", 0.9)
+        })
+    
+    # Node 4 Reasoning (Fraud)
+    if node4_output:
+        all_reasoning.append({
+            "node": "Fraud Detection",
+            "finding": f"Risk level: {node4_output.get('risk_level')}. Indicators: {', '.join(node4_output.get('fraud_indicators', [])) if node4_output.get('fraud_indicators') else 'None'}",
+            "confidence": 1.0 - node4_output.get("fraud_score", 0)
+        })
 
     explanation = []
-
-    # validation summary
-    explanation.append("DOCUMENT CONSISTENCY ANALYSIS:")
-    explanation.append(
-        f"Consistency score: {node2_output.get('consistency_score')}"
-    )
-
-    if node2_output.get("mismatches"):
-        explanation.append(
-            f"Mismatches detected: {node2_output['mismatches']}"
-        )
-    else:
-        explanation.append("No document inconsistencies detected.")
-
-    # coverage summary
-    explanation.append("\nPOLICY COVERAGE ANALYSIS:")
-    if node3_output.get("is_covered"):
-        explanation.append("Claim is covered under policy terms.")
-        explanation.append(
-            f"Covered amount: {node3_output.get('covered_amount')}"
-        )
-    else:
-        explanation.append(
-            f"Claim not covered. Reason: {node3_output.get('reason')}"
-        )
-
-    # fraud summary
-    explanation.append("\nFRAUD RISK ANALYSIS:")
-    explanation.append(
-        f"Fraud score: {node4_output.get('fraud_score')}"
-    )
-    explanation.append(
-        f"Risk level: {node4_output.get('risk_level')}"
-    )
-
-    if node4_output.get("fraud_indicators"):
-        explanation.append(
-            f"Fraud indicators: {node4_output['fraud_indicators']}"
-        )
-
-    explanation.append("\nSYSTEM RECOMMENDATION:")
-    if node4_output.get("risk_level") in ["HIGH", "CRITICAL"]:
-        explanation.append(
-            "Claim requires human investigator review."
-        )
-    else:
-        explanation.append(
-            "Claim can proceed with automated processing."
-        )
+    explanation.append("SYSTEM SUMMARY:")
+    if node2_output: explanation.append(f"- Consistency: {node2_output.get('status')}")
+    if node3_output: explanation.append(f"- Coverage: {'Pass' if node3_output.get('is_covered') else 'Fail'}")
+    if node4_output: explanation.append(f"- Fraud Risk: {node4_output.get('risk_level')}")
 
     return {
         "generated_at": datetime.utcnow(),
-        "explanation_text": "\n".join(explanation)
+        "explanation_text": "\n".join(explanation),
+        "reasoning_steps": all_reasoning
     }

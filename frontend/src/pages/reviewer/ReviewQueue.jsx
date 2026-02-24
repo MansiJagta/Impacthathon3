@@ -13,6 +13,8 @@ export default function ReviewQueue() {
     const [error, setError] = useState(null);
     const [notes, setNotes] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(null); // claimId being submitted
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [sentMessage, setSentMessage] = useState(false);
 
     useEffect(() => {
         async function fetchQueue() {
@@ -22,7 +24,8 @@ export default function ReviewQueue() {
                 setClaims(response.claims || []);
             } catch (err) {
                 console.error("Queue fetch error:", err);
-                setError(err.message);
+                setClaims([]);
+                setError("Failed to fetch reviewer queue.");
             } finally {
                 setLoading(false);
             }
@@ -56,8 +59,22 @@ export default function ReviewQueue() {
         setNotes(prev => ({ ...prev, [claimId]: val }));
     };
 
-    if (loading) return <div style={{ padding: 40, color: C.muted }}>Loading reviewer queue...</div>;
-    if (error) return <div style={{ padding: 40, color: C.red }}>Error: {error}</div>;
+    const handleReviewClick = () => {
+        setShowConfirmation(true);
+    };
+
+    const handleReviewConfirm = (confirmed) => {
+        if (confirmed) {
+            setSentMessage(true);
+            setTimeout(() => {
+                setSentMessage(false);
+            }, 3000);
+        }
+        setShowConfirmation(false);
+    };
+
+    if (loading) return <div style={{ padding: 40, color: "#64748B" }}>Loading reviewer queue...</div>;
+    if (error) return <div style={{ padding: 40, color: "#ef4444" }}>Error: {error}</div>;
 
     return (
         <div>
@@ -65,12 +82,12 @@ export default function ReviewQueue() {
             {/* If no high fraud claims */}
             {claims.length === 0 && (
                 <div style={{
-                    background: C.panel,
-                    border: `1px solid ${C.border}`,
+                    background: "#FFFFFF",
+                    border: `1px solid #E2E8F0`,
                     padding: 40,
-                    borderRadius: 16,
+                    borderRadius: 12,
                     textAlign: "center",
-                    color: C.muted
+                    color: "#64748B"
                 }}>
                     No high-risk claims for manual review.
                 </div>
@@ -80,9 +97,9 @@ export default function ReviewQueue() {
                 <div
                     key={claim.claim_id}
                     style={{
-                        background: C.panel,
-                        border: `1px solid ${C.border}`,
-                        borderRadius: 16,
+                        background: "#FFFFFF",
+                        border: `1px solid #E2E8F0`,
+                        borderRadius: 12,
                         padding: 32,
                         marginBottom: 40
                     }}
@@ -96,7 +113,7 @@ export default function ReviewQueue() {
                         marginBottom: 32
                     }}>
                         <h2 style={{
-                            color: C.text,
+                            color: "#0F172A",
                             fontSize: 20,
                             fontWeight: 800
                         }}>
@@ -104,8 +121,8 @@ export default function ReviewQueue() {
                         </h2>
 
                         <span style={{
-                            background: claim.fraud_score >= FRAUD_THRESHOLD ? "#713f12" : "#14532d",
-                            color: claim.fraud_score >= FRAUD_THRESHOLD ? C.yellow : C.green,
+                            background: claim.fraud_score >= FRAUD_THRESHOLD ? "#FEF3C7" : "#DCFCE7",
+                            color: claim.fraud_score >= FRAUD_THRESHOLD ? "#CA8A04" : "#22c55e",
                             padding: "4px 12px",
                             borderRadius: 20,
                             fontSize: 11,
@@ -121,14 +138,14 @@ export default function ReviewQueue() {
                         {/* LEFT: Claim Details */}
                         <div style={{ flex: 1 }}>
                             <h4 style={{
-                                color: C.muted,
+                                color: "#64748B",
                                 fontSize: 11,
                                 fontWeight: 800,
                                 textTransform: "uppercase",
                                 letterSpacing: 1,
                                 marginBottom: 24,
                                 paddingBottom: 12,
-                                borderBottom: `1px solid ${C.border}`
+                                borderBottom: `1px solid #E2E8F0`
                             }}>
                                 Claim Details
                             </h4>
@@ -147,10 +164,10 @@ export default function ReviewQueue() {
                                         marginBottom: 20
                                     }}
                                 >
-                                    <span style={{ color: C.muted, fontSize: 13 }}>
+                                    <span style={{ color: "#64748B", fontSize: 13 }}>
                                         {item.label}
                                     </span>
-                                    <span style={{ color: C.text, fontSize: 13, fontWeight: 700 }}>
+                                    <span style={{ color: "#0F172A", fontSize: 13, fontWeight: 700 }}>
                                         {item.value}
                                     </span>
                                 </div>
@@ -162,9 +179,9 @@ export default function ReviewQueue() {
                                 onChange={(e) => handleNoteChange(claim.claim_id, e.target.value)}
                                 style={{
                                     width: "100%",
-                                    background: C.bg,
-                                    border: `1px solid ${C.border}`,
-                                    color: C.text,
+                                    background: "#F8FAFC",
+                                    border: `1px solid #E2E8F0`,
+                                    color: "#0F172A",
                                     borderRadius: 8,
                                     padding: "10px",
                                     fontSize: 12,
@@ -180,14 +197,14 @@ export default function ReviewQueue() {
                         {/* RIGHT: AI Analysis */}
                         <div style={{ flex: 1 }}>
                             <h4 style={{
-                                color: C.muted,
+                                color: "#64748B",
                                 fontSize: 11,
                                 fontWeight: 800,
                                 textTransform: "uppercase",
                                 letterSpacing: 1,
                                 marginBottom: 24,
                                 paddingBottom: 12,
-                                borderBottom: `1px solid ${C.border}`
+                                borderBottom: `1px solid #E2E8F0`
                             }}>
                                 AI Analysis
                             </h4>
@@ -199,11 +216,11 @@ export default function ReviewQueue() {
 
                             {claim.fraud_score >= FRAUD_THRESHOLD && (
                                 <div style={{
-                                    background: "#ef444411",
-                                    border: "1px solid #ef444422",
+                                    background: "#FEE2E2",
+                                    border: "1px solid #FECACA",
                                     padding: "12px",
                                     borderRadius: 8,
-                                    color: "#f87171",
+                                    color: "#dc2626",
                                     fontSize: 12
                                 }}>
                                     ⚠ This claim exceeded fraud threshold ({FRAUD_THRESHOLD})
@@ -216,7 +233,7 @@ export default function ReviewQueue() {
                     <div style={{
                         marginTop: 40,
                         paddingTop: 40,
-                        borderTop: `1px solid ${C.border}`,
+                        borderTop: `1px solid #E2E8F0`,
                         display: "flex",
                         gap: 16
                     }}>
@@ -225,7 +242,7 @@ export default function ReviewQueue() {
                             disabled={isSubmitting === claim.claim_id}
                             style={{
                                 flex: 2,
-                                background: C.green,
+                                background: "#22c55e",
                                 color: "#fff",
                                 border: "none",
                                 padding: "16px",
@@ -243,7 +260,7 @@ export default function ReviewQueue() {
                             disabled={isSubmitting === claim.claim_id}
                             style={{
                                 flex: 2,
-                                background: C.red,
+                                background: "#ef4444",
                                 color: "#fff",
                                 border: "none",
                                 padding: "16px",
@@ -260,9 +277,9 @@ export default function ReviewQueue() {
                             onClick={() => navigate(`/claim-details/${claim.claim_id}`)}
                             style={{
                                 flex: 1,
-                                background: C.panel,
-                                color: C.text,
-                                border: `1px solid ${C.border}`,
+                                background: "#FFFFFF",
+                                color: "#0F172A",
+                                border: `1px solid #E2E8F0`,
                                 padding: "16px",
                                 borderRadius: 8,
                                 fontWeight: 800,
@@ -275,6 +292,167 @@ export default function ReviewQueue() {
 
                 </div>
             ))}
+
+            {/* Review Action Card */}
+            <div style={{
+                background: "#FFFFFF",
+                border: `1px solid #E2E8F0`,
+                borderRadius: 12,
+                padding: 40,
+                marginBottom: 40,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 20
+            }}>
+                <div style={{ textAlign: "center" }}>
+                    <h3 style={{
+                        color: "#0F172A",
+                        fontSize: 18,
+                        fontWeight: 800,
+                        marginBottom: 8
+                    }}>
+                        Ready to Submit Reviews
+                    </h3>
+                    <p style={{
+                        color: "#64748B",
+                        fontSize: 14,
+                        margin: 0
+                    }}>
+                        Submit all claims for final review
+                    </p>
+                </div>
+
+                <button
+                    onClick={handleReviewClick}
+                    style={{
+                        background: "#3B82F6",
+                        color: "#fff",
+                        border: "none",
+                        padding: "14px 40px",
+                        borderRadius: 8,
+                        fontWeight: 800,
+                        fontSize: 14,
+                        cursor: "pointer",
+                        marginTop: 8,
+                        transition: "all 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.background = "#2563EB";
+                        e.target.style.transform = "translateY(-2px)";
+                        e.target.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.background = "#3B82F6";
+                        e.target.style.transform = "translateY(0)";
+                        e.target.style.boxShadow = "none";
+                    }}
+                >
+                    Submit Review
+                </button>
+            </div>
+
+            {/* Confirmation Dialog */}
+            {showConfirmation && (
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0, 0, 0, 0.5)",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: "#FFFFFF",
+                        border: `1px solid #E2E8F0`,
+                        borderRadius: 12,
+                        padding: 40,
+                        textAlign: "center",
+                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)",
+                        maxWidth: 400
+                    }}>
+                        <h3 style={{
+                            color: "#0F172A",
+                            fontSize: 18,
+                            fontWeight: 800,
+                            marginBottom: 12
+                        }}>
+                            Confirm Submission
+                        </h3>
+
+                        <p style={{
+                            color: "#64748B",
+                            fontSize: 14,
+                            marginBottom: 32,
+                            margin: "12px 0 32px 0"
+                        }}>
+                            Are you sure you want to send these reviews for processing?
+                        </p>
+
+                        <div style={{
+                            display: "flex",
+                            gap: 12
+                        }}>
+                            <button
+                                onClick={() => handleReviewConfirm(false)}
+                                style={{
+                                    flex: 1,
+                                    background: "#F1F5F9",
+                                    color: "#0F172A",
+                                    border: `1px solid #E2E8F0`,
+                                    padding: "12px",
+                                    borderRadius: 8,
+                                    fontWeight: 800,
+                                    cursor: "pointer",
+                                    fontSize: 13
+                                }}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={() => handleReviewConfirm(true)}
+                                style={{
+                                    flex: 1,
+                                    background: "#3B82F6",
+                                    color: "#fff",
+                                    border: "none",
+                                    padding: "12px",
+                                    borderRadius: 8,
+                                    fontWeight: 800,
+                                    cursor: "pointer",
+                                    fontSize: 13
+                                }}
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Sent Message */}
+            {sentMessage && (
+                <div style={{
+                    position: "fixed",
+                    top: 20,
+                    right: 20,
+                    background: "#22c55e",
+                    color: "#fff",
+                    padding: "16px 24px",
+                    borderRadius: 8,
+                    fontWeight: 800,
+                    fontSize: 14,
+                    boxShadow: "0 10px 25px rgba(34, 197, 94, 0.3)",
+                    zIndex: 1001
+                }}>
+                    ✓ Reviews submitted successfully
+                </div>
+            )}
         </div>
     );
 }

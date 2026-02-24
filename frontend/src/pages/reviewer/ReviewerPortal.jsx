@@ -13,16 +13,16 @@ export default function ReviewerPortal() {
     ];
 
     return (
-        <div style={{ minHeight: "calc(100vh - 56px)", background: C.bg }}>
+        <div style={{ minHeight: "calc(100vh - 56px)" }}>
             <div style={{
-                background: C.panel, borderBottom: `1px solid ${C.border}`,
+                background: "#FFFFFF", borderBottom: `1px solid #E2E8F0`,
                 padding: "0 28px", display: "flex", gap: 4,
             }}>
                 {tabs.map(t => (
                     <button key={t.id} onClick={() => setSub(t.id)} style={{
-                        background: sub === t.id ? "#a855f722" : "transparent",
-                        color: sub === t.id ? "#a855f7" : C.muted,
-                        border: "none", borderBottom: sub === t.id ? "2px solid #a855f7" : "2px solid transparent",
+                        background: sub === t.id ? "#EFF6FF" : "transparent",
+                        color: sub === t.id ? "#2563EB" : "#64748B",
+                        border: "none", borderBottom: sub === t.id ? "2px solid #2563EB" : "2px solid transparent",
                         padding: "14px 18px", cursor: "pointer", fontSize: 13, fontWeight: 600,
                     }}>{t.label}</button>
                 ))}

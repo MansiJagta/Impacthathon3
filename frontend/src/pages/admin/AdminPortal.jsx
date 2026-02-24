@@ -18,7 +18,7 @@ export default function AdminPortal() {
         <div style={{ padding: 40, display: "flex", flexDirection: "column", gap: 32 }}>
 
             {/* Tabs */}
-            <div style={{ display: "flex", gap: 24, borderBottom: `1px solid ${C.border}`, paddingBottom: 16 }}>
+            <div style={{ display: "flex", gap: 24, borderBottom: `1px solid #E2E8F0`, paddingBottom: 16 }}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
@@ -26,11 +26,11 @@ export default function AdminPortal() {
                         style={{
                             background: "transparent",
                             border: "none",
-                            color: activeTab === tab.id ? C.accent : C.muted,
+                            color: activeTab === tab.id ? "#2563EB" : "#64748B",
                             fontWeight: 800,
                             fontSize: 14,
                             cursor: "pointer",
-                            borderBottom: activeTab === tab.id ? `2px solid ${C.accent}` : "none",
+                            borderBottom: activeTab === tab.id ? `2px solid #2563EB` : "none",
                             paddingBottom: 6
                         }}
                     >

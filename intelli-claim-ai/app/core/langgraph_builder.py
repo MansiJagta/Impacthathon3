@@ -66,9 +66,10 @@ def node5_predictive(state: ClaimGraphState):
 def node6_explanation(state: ClaimGraphState):
 	return {
 		"node6_output": generate_explanation(
-			state["node2_output"],
-			state["node3_output"],
-			state["node4_output"],
+			state.get("node1_output", {}),
+			state.get("node2_output", {}),
+			state.get("node3_output", {}),
+			state.get("node4_output", {}),
 		)
 	}
 

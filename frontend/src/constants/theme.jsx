@@ -1,16 +1,16 @@
 export const C = {
-    bg: "#0a0e1a",
-    panel: "#0f1629",
-    border: "#1e2d4a",
-    accent: "#f5a623",
-    accentDim: "#b37218",
-    blue: "#3b82f6",
+    bg: "#F8FAFC",
+    panel: "#FFFFFF",
+    border: "#E2E8F0",
+    accent: "#2563EB",
+    accentDim: "#1D4ED8",
+    blue: "#2563EB",
     green: "#22c55e",
-    yellow: "#eab308",
+    yellow: "#2563EB",
     red: "#ef4444",
-    text: "#e2e8f0",
-    muted: "#64748b",
-    dim: "#334155",
+    text: "#0F172A",
+    muted: "#64748B",
+    dim: "#475569",
 };
 
 export const cls = (...args) => args.filter(Boolean).join(" ");

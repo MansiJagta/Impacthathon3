@@ -34,6 +34,22 @@ def extract_context(node1_output, policy):
     incident_date = None
     policy_number = ""
 
+    # ========================================
+    # 1. TRY TOP-LEVEL EXTRACTED ENTITIES FIRST
+    # ========================================
+    extracted_entities = node1_output.get("extracted_entities", {})
+    if extracted_entities:
+        claimant_name = extracted_entities.get("claimer_name", "")
+        if not policy_number:
+            policy_number = extracted_entities.get("policy_number", "")
+        if not claim_amount:
+            claim_amount = extracted_entities.get("total_amount") or extracted_entities.get("amount", 0)
+        if not incident_date:
+            incident_date = extracted_entities.get("admission_date") or extracted_entities.get("incident_date")
+
+    # ========================================
+    # 2. FALLBACK TO DOCUMENT-LEVEL FIELDS
+    # ========================================
     for doc in node1_output.get("documents", []):
         fields = doc.get("structured_fields", {})
         dtype = doc.get("document_type")
@@ -51,11 +67,13 @@ def extract_context(node1_output, policy):
 
         # Prefer richer LLM extraction
         if not claimant_name:
-            claimant_name = fields.get("claimer_name") or str(_first_field_value(fields, "holder_name", "") or "")
+            temp = fields.get("claimer_name") or _first_field_value(fields, "holder_name", "")
+            claimant_name = temp[0] if isinstance(temp, list) else str(temp or "")
 
         # Extract policy number
         if not policy_number:
-            policy_number = fields.get("policy_number") or str(_first_field_value(fields, "policy_number", "") or "")
+            temp = fields.get("policy_number") or _first_field_value(fields, "policy_number", "")
+            policy_number = temp[0] if isinstance(temp, list) else str(temp or "")
 
         if not incident_date:
             res = fields.get("incident_date")
@@ -95,14 +113,14 @@ def fraud_detection(node1_output, policy):
     mongodb_result = None
     lookup_key = None
     
-    if policy_number:
-        print(f"  → Searching by policy number: {policy_number}")
-        mongodb_result = classify_fraud_mongodb(policy_number=policy_number)
-        lookup_key = "policy_number"
-    elif name:
+    if name:
         print(f"  → Searching by claimer name: {name}")
         mongodb_result = classify_fraud_mongodb(claimer_name=name)
         lookup_key = "claimer_name"
+    elif policy_number:
+        print(f"  → Searching by policy number: {policy_number}")
+        mongodb_result = classify_fraud_mongodb(policy_number=policy_number)
+        lookup_key = "policy_number"
     else:
         print(f"  → No policy number or claimer name available for MongoDB lookup")
     

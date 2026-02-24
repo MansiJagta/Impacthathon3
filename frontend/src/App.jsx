@@ -23,12 +23,14 @@ export default function App() {
   };
 
   return (
-    <div style={{
-      fontFamily: "'DM Sans', sans-serif",
-      background: C.bg,
-      minHeight: "100vh",
-      color: C.text
-    }}>
+    <div
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        minHeight: "100vh",
+        color: "#0F172A",
+        background: "linear-gradient(135deg, #0F172A 0%, #1E3A8A 40%, #2563EB 100%)"
+      }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }

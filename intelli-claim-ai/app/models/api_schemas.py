@@ -11,6 +11,7 @@ class ClaimerInfo(BaseModel):
     email: str
     phone: str | None = None
     address: str | None = None
+    aadhaar_id: str | None = None
 
 
 class ClaimSubmitRequest(BaseModel):
@@ -63,6 +64,11 @@ class ClaimDetailsResponse(BaseModel):
     fraud_score: float = 0.0
     risk_score: float = 0.0
     policy_number: str | None = None
+    hospital: str | None = None
+    admission_date: str | None = None
+    discharge_date: str | None = None
+    diagnosis: str | None = None
+    claimed_amount: float | None = None
     claimer: ClaimerInfo
     metadata: dict[str, Any] = Field(default_factory=dict)
     reasoning: list[ClaimReasoningItem] = Field(default_factory=list)

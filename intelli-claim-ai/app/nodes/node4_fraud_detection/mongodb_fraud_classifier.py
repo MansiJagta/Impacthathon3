@@ -61,7 +61,7 @@ def _fetch_fraud_data_by_policy(policy_number):
     """
     try:
         result = fraud_classification_collection.find_one(
-            {"policy number": policy_number}
+            {"policy_number": policy_number}
         )
         return result
     except Exception as e:
@@ -81,7 +81,7 @@ def _fetch_fraud_data_by_claimer(claimer_name):
     """
     try:
         result = fraud_classification_collection.find_one(
-            {"claimer name": claimer_name}
+            {"claimer_name": claimer_name}
         )
         return result
     except Exception as e:
@@ -340,16 +340,19 @@ def classify_fraud_mongodb(policy_number=None, claimer_name=None):
 
     # Fetch fraud data from MongoDB
     fraud_data = None
-    search_field = None
+    search_field_display = None
+    search_field_key = None
     
     if policy_number:
         print(f"    → Querying MongoDB: policy_number = '{policy_number}'")
         fraud_data = _fetch_fraud_data_by_policy(policy_number)
-        search_field = "policy number"
+        search_field_display = "policy_number"
+        search_field_key = "policy_number"
     elif claimer_name:
         print(f"    → Querying MongoDB: claimer_name = '{claimer_name}'")
         fraud_data = _fetch_fraud_data_by_claimer(claimer_name)
-        search_field = "claimer name"
+        search_field_display = "claimer_name"
+        search_field_key = "claimer_name"
     else:
         print(f"    ✗ No search criteria provided")
         return None
@@ -358,7 +361,7 @@ def classify_fraud_mongodb(policy_number=None, claimer_name=None):
         print(f"    ✗ No matching record found in MongoDB")
         return None
     
-    print(f"    ✓ Record found ({search_field}: {fraud_data.get(search_field, 'N/A')})")
+    print(f"    ✓ Record found ({search_field_display}: {fraud_data.get(search_field_key, 'N/A')})")
 
     # Preprocess data
     print(f"    → Preprocessing data for model ({len(features_list)} features)...")
@@ -385,7 +388,7 @@ def classify_fraud_mongodb(policy_number=None, claimer_name=None):
             'confidence': min(abs(probability - 0.5) * 2 + 0.5, 1.0),  # Confidence based on distance from 0.5
             'indicators': [f"LightGBM prediction: {['Not Fraud', 'Fraud'][int(prediction)]}"],
             'source': 'mongodb_lightgbm',
-            'search_field': search_field,
+            'search_field': search_field_display,
             'matched_record': fraud_data.get('_id')
         }
     except Exception as e:

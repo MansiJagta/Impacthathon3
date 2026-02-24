@@ -5,8 +5,8 @@ import api from "../../services/api";
 
 const UserStat = ({ label, value }) => (
     <div style={{ flex: 1, textAlign: "center" }}>
-        <div style={{ color: C.blue, fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{value}</div>
-        <div style={{ color: C.muted, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</div>
+        <div style={{ color: "#2563EB", fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{value}</div>
+        <div style={{ color: "#64748B", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</div>
     </div>
 );
 
@@ -43,11 +43,11 @@ export default function UserSearch() {
                     placeholder="Enter user email or name..."
                     style={{
                         flex: 1,
-                        background: C.panel,
-                        border: `1px solid ${C.border}`,
+                        background: "#FFFFFF",
+                        border: `1px solid #E2E8F0`,
                         padding: "16px 24px",
                         borderRadius: 8,
-                        color: C.text,
+                        color: "#0F172A",
                         fontSize: 16,
                         outline: "none"
                     }}
@@ -56,7 +56,7 @@ export default function UserSearch() {
                     onClick={handleSearch}
                     disabled={loading}
                     style={{
-                        background: "#a855f7",
+                        background: "#2563EB",
                         color: "#fff",
                         border: "none",
                         padding: "0 32px",
@@ -70,16 +70,16 @@ export default function UserSearch() {
                 </button>
             </div>
 
-            {error && <p style={{ color: C.red, marginBottom: 20 }}>{error}</p>}
+            {error && <p style={{ color: "#ef4444", marginBottom: 20 }}>{error}</p>}
 
             {results.length > 0 && (
                 <>
-                    <p style={{ color: C.muted, fontSize: 12, marginBottom: 24 }}>Results for "{query}" ({results.length} claims)</p>
+                    <p style={{ color: "#64748B", fontSize: 12, marginBottom: 24 }}>Results for "{query}" ({results.length} claims)</p>
 
                     <div style={{
-                        background: C.panel,
-                        border: `1px solid ${C.border}`,
-                        borderRadius: 16,
+                        background: "#FFFFFF",
+                        border: `1px solid #E2E8F0`,
+                        borderRadius: 12,
                         overflow: "hidden",
                         marginBottom: 32
                     }}>
@@ -87,20 +87,20 @@ export default function UserSearch() {
                             {results.map((c, i) => (
                                 <div key={i} style={{
                                     padding: "24px",
-                                    borderBottom: i === results.length - 1 ? "none" : `1px solid ${C.border}`
+                                    borderBottom: i === results.length - 1 ? "none" : `1px solid #E2E8F0`
                                 }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                            <span style={{ color: C.accent, fontWeight: 800, fontSize: 14 }}>{c.claim_id}</span>
-                                            <span style={{ background: C.dim, color: C.text, padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claim_type}</span>
-                                            <span style={{ color: C.text, fontWeight: 800, fontSize: 16 }}>₹{c.claim_amount.toLocaleString()}</span>
+                                            <span style={{ color: "#2563EB", fontWeight: 800, fontSize: 14 }}>{c.claim_id}</span>
+                                            <span style={{ background: "#F1F5F9", color: "#0F172A", padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claim_type}</span>
+                                            <span style={{ color: "#0F172A", fontWeight: 800, fontSize: 16 }}>₹{c.claim_amount.toLocaleString()}</span>
                                         </div>
                                         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                                             <Badge status={c.status} />
-                                            <span style={{ color: C.muted, fontSize: 12 }}>{new Date(c.created_at).toLocaleDateString()}</span>
+                                            <span style={{ color: "#64748B", fontSize: 12 }}>{new Date(c.created_at).toLocaleDateString()}</span>
                                         </div>
                                     </div>
-                                    <p style={{ color: C.muted, fontSize: 12 }}>{c.summary}</p>
+                                    <p style={{ color: "#64748B", fontSize: 12 }}>{c.summary}</p>
                                 </div>
                             ))}
                         </div>
@@ -110,12 +110,12 @@ export default function UserSearch() {
 
             {stats && (
                 <div style={{
-                    background: C.panel,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: 16,
+                    background: "#FFFFFF",
+                    border: `1px solid #E2E8F0`,
+                    borderRadius: 12,
                     padding: "24px 24px"
                 }}>
-                    <h4 style={{ color: C.muted, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 25 }}>
+                    <h4 style={{ color: "#64748B", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 25 }}>
                         User Stats
                     </h4>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -128,7 +128,7 @@ export default function UserSearch() {
             )}
 
             {!loading && results.length === 0 && query && !error && (
-                <p style={{ color: C.muted, textAlign: "center", padding: 40 }}>No results found for "{query}".</p>
+                <p style={{ color: "#64748B", textAlign: "center", padding: 40 }}>No results found for "{query}".</p>
             )}
         </div>
     );

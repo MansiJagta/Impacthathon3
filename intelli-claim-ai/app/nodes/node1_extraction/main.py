@@ -1,9 +1,19 @@
 import sys
 import argparse
+from fastapi.middleware.cors import CORSMiddleware
+
+
 def cli_mode():
     parser = argparse.ArgumentParser(description="Node1 Document Extraction CLI")
-    parser.add_argument('--files', nargs='+', required=True, help='List of file paths to extract')
-    parser.add_argument('--types', nargs='+', required=True, help='List of document types (policy, bill, id_proof, report)')
+    parser.add_argument(
+        "--files", nargs="+", required=True, help="List of file paths to extract"
+    )
+    parser.add_argument(
+        "--types",
+        nargs="+",
+        required=True,
+        help="List of document types (policy, bill, id_proof, report)",
+    )
     args = parser.parse_args()
 
     if len(args.files) != len(args.types):
@@ -22,7 +32,10 @@ def cli_mode():
         "extraction_confidence": 0.95,
     }
     import json
+
     print(json.dumps(result, indent=2))
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         cli_mode()
@@ -40,6 +53,16 @@ from .extractor import (
 )
 
 app = FastAPI(title="Node1 OCR API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5174",  # your Vite frontend
+        "http://localhost:5173",  # add this too just in case
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -57,25 +80,16 @@ def classify_document(doc_type: str):
     return "unknown"
 
 
+from .extraction_engine import extract_node_1
+
+
 def process_document(file_path: str, doc_type: str):
-    if file_path.lower().endswith(".pdf"):
-        text = extract_text_from_pdf(file_path)
-    else:
-        text = extract_text_from_image(file_path)
-
-    if doc_type == "policy":
-        return extract_policy_fields(text)
-
-    elif doc_type == "bill":
-        return extract_bill_fields(text)
-
-    elif doc_type == "id_proof":
-        return extract_id_fields(text)
-
-    elif doc_type == "report":
-        return extract_report_fields(text)
-
-    return {}
+    """
+    High-accuracy document processing.
+    Note: doc_type is now primarily used for downstream routing,
+    as the VDU engine handles multi-field extraction.
+    """
+    return extract_node_1(file_path)
 
 
 @app.post("/upload")

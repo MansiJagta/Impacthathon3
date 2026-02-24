@@ -2,13 +2,26 @@ from datetime import datetime
 
 
 def parse_date(d):
-    if not d:
+    if not d or d == "N/A":
         return None
-    return datetime.strptime(d, "%d/%m/%Y")
+    if isinstance(d, datetime):
+        return d
+    if not isinstance(d, str):
+        return None
+        
+    formats = ["%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y", "%m/%d/%Y"]
+    for fmt in formats:
+        try:
+            return datetime.strptime(d.split()[0].replace(",", ""), fmt)
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 def is_policy_active(policy, incident_date):
-
+    if incident_date is None:
+        return True # Default to True to allow human review instead of crashing
+    
     start = policy["effectiveDate"]
     end = policy["expiryDate"]
 

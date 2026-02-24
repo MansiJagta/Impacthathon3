@@ -48,9 +48,9 @@ export default function ClaimerHistory() {
     return (
         <div>
             <div style={{
-                background: C.panel,
-                border: `1px solid ${C.border}`,
-                borderRadius: 12,
+                background: "#FFFFFF",
+                border: `1px solid #E2E8F0`,
+                borderRadius: 8,
                 padding: "16px 24px",
                 display: "flex",
                 alignItems: "center",
@@ -67,7 +67,7 @@ export default function ClaimerHistory() {
                         flex: 1,
                         background: "transparent",
                         border: "none",
-                        color: C.text,
+                        color: "#0F172A",
                         outline: "none",
                         fontSize: 14
                     }}
@@ -75,21 +75,21 @@ export default function ClaimerHistory() {
             </div>
 
             <div style={{
-                background: C.panel,
-                border: `1px solid ${C.border}`,
+                background: "#FFFFFF",
+                border: `1px solid #E2E8F0`,
                 borderRadius: 12,
                 overflow: "hidden"
             }}>
-                <div style={{ padding: "20px 24px", borderBottom: `1px solid ${C.border}`, background: "rgba(255,255,255,0.02)" }}>
-                    <h3 style={{ color: C.muted, fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
+                <div style={{ padding: "20px 24px", borderBottom: `1px solid #E2E8F0`, background: "#F8FAFC" }}>
+                    <h3 style={{ color: "#64748B", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
                         All My Claims ({claims.length} Results)
                     </h3>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                     {loading ? (
-                        <div style={{ padding: 40, textAlign: "center", color: C.muted }}>Loading history...</div>
+                        <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>Loading history...</div>
                     ) : claims.length === 0 ? (
-                        <div style={{ padding: 40, textAlign: "center", color: C.muted }}>No claims found.</div>
+                        <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>No claims found.</div>
                     ) : (
                         claims.map((c, i) => (
                             <div
@@ -97,28 +97,28 @@ export default function ClaimerHistory() {
                                 onClick={() => navigate(`/claim-details/${c.claim_id}`)}
                                 style={{
                                     padding: "24px",
-                                    borderBottom: i === claims.length - 1 ? "none" : `1px solid ${C.border}`,
+                                    borderBottom: i === claims.length - 1 ? "none" : `1px solid #E2E8F0`,
                                     display: "flex",
                                     flexDirection: "column",
                                     gap: 12,
                                     cursor: "pointer",
                                     transition: "background 0.2s ease"
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                                onMouseEnter={(e) => e.currentTarget.style.background = "#F8FAFC"}
                                 onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                             >
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                                        <span style={{ color: C.accent, fontWeight: 800, fontSize: 14 }}>{c.claim_id}</span>
-                                        <span style={{ background: C.dim, color: C.text, padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claim_type}</span>
-                                        <span style={{ color: C.text, fontWeight: 800, fontSize: 16 }}>₹{c.claim_amount.toLocaleString()}</span>
+                                        <span style={{ color: "#2563EB", fontWeight: 800, fontSize: 14 }}>{c.claim_id}</span>
+                                        <span style={{ background: "#F1F5F9", color: "#0F172A", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claim_type}</span>
+                                        <span style={{ color: "#0F172A", fontWeight: 800, fontSize: 16 }}>₹{c.claim_amount.toLocaleString()}</span>
                                     </div>
                                     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                                         <Badge status={c.badge} />
-                                        <span style={{ color: C.muted, fontSize: 12 }}>{formatDate(c.created_at)}</span>
+                                        <span style={{ color: "#64748B", fontSize: 12 }}>{formatDate(c.created_at)}</span>
                                     </div>
                                 </div>
-                                <p style={{ color: C.muted, fontSize: 13 }}>{c.summary}</p>
+                                <p style={{ color: "#64748B", fontSize: 13 }}>{c.summary}</p>
                             </div>
                         ))
                     )}
@@ -126,7 +126,7 @@ export default function ClaimerHistory() {
             </div>
 
             {!loading && (
-                <div style={{ marginTop: 24, textAlign: "center", color: C.muted, fontSize: 12 }}>
+                <div style={{ marginTop: 24, textAlign: "center", color: "#64748B", fontSize: 12 }}>
                     Summary: {stats.total} Total • {stats.approved} Approved • {stats.pending} Pending • {stats.rejected} Rejected
                 </div>
             )}

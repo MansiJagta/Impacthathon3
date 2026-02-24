@@ -11,11 +11,12 @@ export default function UserActivity() {
         async function fetchActivity() {
             setLoading(true);
             try {
-                const data = await api.getUserActivity();
-                setActivities(data.activities || []);
+                const response = await api.getUserActivity();
+                // API returns { count, users: [...] }
+                setActivities(response.users || []);
             } catch (err) {
                 console.error("Error fetching user activity:", err);
-                setError(err.message);
+                setError("Failed to load global activity.");
             } finally {
                 setLoading(false);
             }
@@ -23,13 +24,13 @@ export default function UserActivity() {
         fetchActivity();
     }, []);
 
-    if (loading) return <div style={{ color: C.muted, padding: 24 }}>Loading activity...</div>;
-    if (error) return <div style={{ color: C.red, padding: 24 }}>Error: {error}</div>;
+    if (loading) return <div style={{ color: "#64748B", padding: 24 }}>Loading activity...</div>;
+    if (error) return <div style={{ color: "#ef4444", padding: 24 }}>Error: {error}</div>;
 
     return (
-        <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "24px", borderBottom: `1px solid ${C.border}`, background: "rgba(255,255,255,0.02)" }}>
-                <h3 style={{ color: C.muted, fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
+        <div style={{ background: "#FFFFFF", border: `1px solid #E2E8F0`, borderRadius: 12, overflow: "hidden" }}>
+            <div style={{ padding: "24px", borderBottom: `1px solid #E2E8F0`, background: "#F8FAFC" }}>
+                <h3 style={{ color: "#64748B", fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
                     User Activity Overview
                 </h3>
             </div>
@@ -47,16 +48,16 @@ export default function UserActivity() {
                     </thead>
                     <tbody>
                         {activities.length > 0 ? activities.map((u, i) => (
-                            <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
-                                <td style={tdStyle}>{u.name}</td>
-                                <td style={tdStyle}>{u.role === 'claimer' ? '👤 Claimer' : '⚖ Reviewer'}</td>
-                                <td style={tdStyle}>{u.claims_count}</td>
-                                <td style={{ ...tdStyle, color: u.approval_rate > 70 ? C.green : C.yellow, fontWeight: 800 }}>{u.approval_rate}%</td>
-                                <td style={{ ...tdStyle, color: C.muted }}>{u.last_active}</td>
+                            <tr key={i} style={{ borderBottom: `1px solid #E2E8F0` }}>
+                                <td style={tdStyle}>{u.user || u.email}</td>
+                                <td style={tdStyle}>{u.role === 'Claimer' ? '👤 Claimer' : '⚖ Reviewer'}</td>
+                                <td style={tdStyle}>{u.claims}</td>
+                                <td style={{ ...tdStyle, color: u.approval_rate > 70 ? "#22c55e" : "#CA8A04", fontWeight: 800 }}>{u.approval_rate}%</td>
+                                <td style={{ ...tdStyle, color: "#64748B" }}>{u.last_active ? new Date(u.last_active).toLocaleString() : 'N/A'}</td>
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan="5" style={{ padding: 40, textAlign: "center", color: C.muted }}>No user activity recorded.</td>
+                                <td colSpan="5" style={{ padding: 40, textAlign: "center", color: "#64748B" }}>No user activity recorded.</td>
                             </tr>
                         )}
                     </tbody>
@@ -68,7 +69,7 @@ export default function UserActivity() {
 
 const thStyle = {
     padding: "12px 24px",
-    color: "#64748b",
+    color: "#64748B",
     fontSize: 11,
     fontWeight: 800,
     textTransform: "uppercase",
@@ -76,7 +77,7 @@ const thStyle = {
 
 const tdStyle = {
     padding: "20px 24px",
-    color: "#fff",
+    color: "#0F172A",
     fontSize: 13,
     fontWeight: 600
 };
