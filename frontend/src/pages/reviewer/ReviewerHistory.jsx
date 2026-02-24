@@ -47,9 +47,9 @@ export default function ReviewerHistory() {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                                 <span style={{ color: C.accent, fontWeight: 800, fontSize: 14 }}>{c.claim_id}</span>
-                                <span style={{ background: C.dim, color: C.text, padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claimer.name}</span>
+                                <span style={{ background: C.dim, color: C.text, padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claimer?.name || "Unknown"}</span>
                                 <span style={{ background: C.dim, color: C.text, padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>{c.claim_type}</span>
-                                <span style={{ color: C.text, fontWeight: 800, fontSize: 16 }}>₹{c.claim_amount.toLocaleString() || 0}</span>
+                                <span style={{ color: C.text, fontWeight: 800, fontSize: 16 }}>₹{(c.claim_amount || 0).toLocaleString()}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                                 <Badge status={c.status} />

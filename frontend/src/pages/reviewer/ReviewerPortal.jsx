@@ -13,7 +13,7 @@ export default function ReviewerPortal() {
     ];
 
     return (
-        <div style={{ minHeight: "calc(100vh - 56px)", background: C.bg }}>
+        <div style={{ minHeight: "calc(100vh - 56px)" }}>
             <div style={{
                 background: C.panel, borderBottom: `1px solid ${C.border}`,
                 padding: "0 28px", display: "flex", gap: 4,

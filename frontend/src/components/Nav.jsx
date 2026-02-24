@@ -86,7 +86,17 @@ export default function Nav() {
                                 border: "none",
                                 fontSize: 16,
                                 fontWeight: 600,
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                position: "relative",
+                                transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.color = C.accent;
+                                e.target.style.transform = "translateY(-2px)";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.color = C.text;
+                                e.target.style.transform = "translateY(0)";
                             }}
                         >
                             Login
@@ -98,17 +108,25 @@ export default function Nav() {
                                 background: C.accent,
                                 color: "#000",
                                 border: "none",
-                                padding: "8px 16px",
-                                borderRadius: 6,
+                                padding: "8px 18px",
+                                borderRadius: 22,
                                 fontSize: 16,
                                 fontWeight: 800,
                                 cursor: "pointer",
-                                boxShadow: `0 4px 12px ${C.accent}44`
+                                boxShadow: `0 4px 12px ${C.accent}44`,
+                                transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = "scale(1.05)";
+                                e.target.style.boxShadow = `0 6px 18px ${C.accent}88`;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = "scale(1)";
+                                e.target.style.boxShadow = `0 4px 12px ${C.accent}44`;
                             }}
                         >
                             Get Started
                         </button>
-
                     </div>
                 )}
             </div>

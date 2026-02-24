@@ -2,24 +2,59 @@ import { useState, useEffect } from "react";
 import { C } from "../constants/theme";
 import api from "../services/api";
 
-const AdminStat = ({ label, value, trend, trendColor }) => (
-    <div style={{
-        background: C.panel,
-        border: `1px solid ${C.border}`,
-        borderRadius: 12,
-        padding: "24px",
-        flex: 1,
-        minWidth: 200
-    }}>
-        <div style={{ color: C.muted, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>{label}</div>
-        <div style={{ color: C.text, fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{value}</div>
-        {trend && (
-            <div style={{ color: trendColor, fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                {trend}
+const AdminStat = ({ label, value, color }) => {
+    const [hover, setHover] = useState(false);
+
+    return (
+        <div
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            style={{
+                background: C.panel,
+                border: `1px solid ${hover ? color : C.border}`,
+                borderRadius: 20,
+                padding: "28px",
+                flex: 1,
+                minWidth: 200,
+                position: "relative",
+                overflow: "hidden",
+                transition: "all 0.3s ease",
+                transform: hover ? "translateY(-6px)" : "translateY(0)",
+                boxShadow: hover ? `0 0 40px ${color}55` : "none"
+            }}
+        >
+            {/* Top Accent Line */}
+            <div style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: 3,
+                background: color,
+                opacity: 0.8
+            }} />
+
+            <div style={{
+                color: color,
+                fontSize: 42,
+                fontWeight: 900,
+                marginBottom: 10
+            }}>
+                {value}
             </div>
-        )}
-    </div>
-);
+
+            <div style={{
+                color: C.muted,
+                fontSize: 12,
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: 1
+            }}>
+                {label}
+            </div>
+        </div>
+    );
+};
 
 const TypeRow = ({ label, icon, val, color }) => (
     <div style={{ marginBottom: 16 }}>
@@ -68,11 +103,21 @@ export default function AdminDashboard() {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-                <AdminStat label="Total Claims" value={stats.total_claims || 0} trend="▲ +12%" trendColor={C.green} />
-                <AdminStat label="Auto Rate" value={`${stats.auto_rate || 0}%`} trend="▲ +5%" trendColor={C.green} />
-                <AdminStat label="Avg Process Time" value={stats.avg_time || "N/A"} trend="▼ -2 min" trendColor={C.green} />
-                <AdminStat label="Fraud Accuracy" value={`${stats.fraud_accuracy || 0}%`} trend="▲ +2%" trendColor={C.green} />
+            <div
+                style={{
+                    display: "flex",
+                    gap: 20,
+                    flexWrap: "wrap",
+                    padding: 20,
+                    borderRadius: 20,
+                    background: "linear-gradient(to right, rgba(99,102,241,0.05), transparent)",
+                    marginBottom: 8
+                }}
+            >
+                <AdminStat label="Total Claims" value={stats.total_claims || 0} color={C.blue} />
+                <AdminStat label="Auto Rate" value={`${stats.auto_rate || 0}%`} color={C.green} />
+                <AdminStat label="Avg Process Time" value={stats.avg_time || "N/A"} color={C.yellow} />
+                <AdminStat label="Fraud Accuracy" value={`${stats.fraud_accuracy || 0}%`} color={C.red} />
             </div>
 
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>

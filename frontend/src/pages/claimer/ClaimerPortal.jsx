@@ -14,7 +14,7 @@ export default function ClaimerPortal() {
     ];
 
     return (
-        <div style={{ minHeight: "calc(100vh - 56px)", background: C.bg }}>
+        <div style={{ minHeight: "calc(100vh - 56px)" }}>
             <div style={{ background: C.panel, borderBottom: `1px solid ${C.border}`, padding: "0 28px", display: "flex", gap: 4 }}>
                 {tabs.map(t => (
                     <button key={t.id} onClick={() => setSub(t.id)} style={{

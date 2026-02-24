@@ -112,7 +112,18 @@ export default function NewClaimForm() {
     const currentConfig = insuranceConfig[type];
 
     return (
-        <div>
+        <div
+            style={{
+                background: C.panel,
+                border: `1px solid ${C.border}`,
+                borderRadius: 20,
+                padding: "48px",
+                boxShadow: "0 30px 60px rgba(0,0,0,0.12)",
+                maxWidth: "1200px",
+                margin: "60px auto",
+                backdropFilter: "blur(6px)",
+            }}
+        >
             <div style={{ marginBottom: 40 }}>
                 <p style={{ color: C.muted, fontSize: 11, fontWeight: 800, textTransform: "uppercase", marginBottom: 16 }}>
                     Step 1: SELECT INSURANCE TYPE
@@ -136,15 +147,28 @@ export default function NewClaimForm() {
                                 background: type === t.id ? C.blue + "22" : C.panel,
                                 color: type === t.id ? C.blue : C.muted,
                                 border: `1px solid ${type === t.id ? C.blue : C.border}`,
-                                padding: "12px 24px",
-                                borderRadius: 8,
+                                padding: "14px 24px",
+                                borderRadius: 12,
                                 cursor: "pointer",
                                 fontWeight: 700,
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 8,
                                 flex: 1,
-                                transition: "all 0.2s ease"
+                                transition: "all 0.25s ease",
+                                boxShadow: type === t.id ? `0 6px 18px ${C.blue}33` : "none",
+                            }}
+                            onMouseEnter={(e) => {
+                                if (type !== t.id) {
+                                    e.currentTarget.style.transform = "translateY(-2px)";
+                                    e.currentTarget.style.borderColor = C.blue;
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                if (type !== t.id) {
+                                    e.currentTarget.style.borderColor = C.border;
+                                }
                             }}
                         >
                             <span>{t.icon}</span> {t.id}
@@ -175,7 +199,15 @@ export default function NewClaimForm() {
                                         borderRadius: 6,
                                         color: C.text,
                                         outline: "none",
-                                        boxSizing: "border-box"
+                                        boxSizing: "border-box",
+                                        transition: "all 0.2s ease",
+                                    }} onFocus={(e) => {
+                                        e.currentTarget.style.borderColor = C.blue;
+                                        e.currentTarget.style.boxShadow = `0 0 0 3px ${C.blue}22`;
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.borderColor = C.border;
+                                        e.currentTarget.style.boxShadow = "none";
                                     }}
                                 />
                             </div>
@@ -233,16 +265,26 @@ export default function NewClaimForm() {
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                             style={{
-                                flex: 1,
                                 background: C.blue,
                                 color: "#fff",
                                 border: "none",
-                                padding: "16px",
-                                borderRadius: 8,
+                                padding: "18px",
+                                borderRadius: 12,
                                 fontWeight: 800,
                                 cursor: isSubmitting ? "not-allowed" : "pointer",
                                 opacity: isSubmitting ? 0.7 : 1,
-                                boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)"
+                                boxShadow: `0 8px 20px ${C.blue}44`,
+                                transition: "all 0.3s ease"
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isSubmitting) {
+                                    e.currentTarget.style.transform = "translateY(-3px)";
+                                    e.currentTarget.style.boxShadow = `0 15px 30px ${C.blue}66`;
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.boxShadow = `0 8px 20px ${C.blue}44`;
                             }}
                         >
                             {isSubmitting ? "Processing Claim..." : "🚀 Submit Claim for AI Review"}

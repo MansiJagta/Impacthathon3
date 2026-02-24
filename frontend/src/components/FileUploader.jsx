@@ -65,7 +65,7 @@ export default function FileUploader({ label, icon, onFilesChange, files = [] })
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ color: files.length > 0 ? C.green : C.yellow, fontSize: 11, fontWeight: 800 }}>
-                        {files.length > 0 ? `✓ ${files.length} File(s)` : "⏳ Pending"}
+                        {files.length > 0 ? `✓ ${files.length} File(s)` : "Pending"}
                     </div>
                     <button
                         onClick={() => fileInputRef.current.click()}

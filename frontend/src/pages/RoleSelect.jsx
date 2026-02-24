@@ -43,7 +43,7 @@ export default function RoleSelect() {
         <div style={{ maxWidth: 1000, margin: "100px auto", padding: "0 24px" }}>
             <div style={{ textAlign: "center", marginBottom: 48 }}>
                 <h2 style={{ color: C.text, fontSize: 32, fontWeight: 900, marginBottom: 12 }}>
-                    Welcome back, John!
+                    Welcome back
                 </h2>
                 <p style={{ color: C.muted, fontSize: 16 }}>
                     Select your portal to continue

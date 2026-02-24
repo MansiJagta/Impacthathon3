@@ -15,28 +15,19 @@ export default function Login() {
             title: "Customer Login",
             desc: "Access your claims and policy details",
             icon: "🛡️",
-            primaryBtn: "Login to Portal",
             portalPath: "/portal/claimer",
-            altText: "New to IntelliClaim?",
-            altLink: "Create an account"
         },
         reviewer: {
-            title: "Reviewer SSO",
-            desc: "Internal Claims Processing Environment",
+            title: "Reviewer Login",
+            desc: "Access internal claims processing environment",
             icon: "🔍",
-            primaryBtn: "Sign in with Okta",
             portalPath: "/portal/reviewer",
-            altText: "Issues with SSO?",
-            altLink: "Contact IT Support"
         },
         admin: {
-            title: "Admin Terminal",
-            desc: "Secure System Administration & Analytics",
+            title: "Admin Login",
+            desc: "Secure system administration access",
             icon: "⚙️",
-            primaryBtn: "Authorize with Key",
             portalPath: "/portal/admin",
-            altText: "Security Notice:",
-            altLink: "MFA Required for all sessions"
         }
     };
 
@@ -47,111 +38,118 @@ export default function Login() {
     }
 
     const handleLogin = () => {
-        // Later you can add real authentication here
-        localStorage.setItem("userRole", role);
-        if (role === "claimer" && email) {
-            localStorage.setItem("userEmail", email);
+        if (!email || !pass) {
+            alert("Please enter email and password.");
+            return;
         }
+
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("userEmail", email);
+
         navigate(config.portalPath);
     };
 
-    return (
-        <div style={{
-            maxWidth: 420,
-            margin: "120px auto",
-            padding: "40px",
-            background: C.panel,
-            border: `1px solid ${C.border}`,
-            borderRadius: 24,
-            boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
-            textAlign: "center"
-        }}>
+    const getButtonColor = () => {
+        if (role === "admin") return "#a855f7";
+        if (role === "reviewer") return "#a855f7";
+        if (role === "claimer") return "#a855f7";
+    };
 
-            {/* Back Button */}
-            <button
-                onClick={() => navigate("/role-select")}
+    return (
+        <div
+            style={{
+                minHeight: "100vh",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "40px 20px"
+            }}
+        >
+            <div
                 style={{
-                    background: "transparent",
-                    border: "none",
-                    color: C.muted,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    marginBottom: 32
+                    width: "100%",
+                    maxWidth: 420,
+                    padding: "40px",
+                    background: C.panel,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 24,
+                    boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
+                    textAlign: "center"
                 }}
             >
-                ← Back to Selection
-            </button>
 
-            <div style={{ fontSize: 64, marginBottom: 20 }}>
-                {config.icon}
-            </div>
+                {/* Back Button */}
+                <button
+                    onClick={() => navigate("/role-select")}
+                    style={{
+                        background: "transparent",
+                        border: "none",
+                        color: C.muted,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        marginBottom: 32
+                    }}
+                >
+                    ← Back to Selection
+                </button>
 
-            <h2 style={{ color: "#fff", fontSize: 28, fontWeight: 900, marginBottom: 8 }}>
-                {config.title}
-            </h2>
-
-            <p style={{ color: C.muted, fontSize: 14, marginBottom: 40 }}>
-                {config.desc}
-            </p>
-
-            {role === "claimer" ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <input
-                        type="email"
-                        placeholder="Email Address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={{
-                            background: "rgba(255,255,255,0.05)",
-                            border: `1px solid ${C.border}`,
-                            padding: "16px",
-                            borderRadius: 12,
-                            color: "#fff",
-                            fontSize: 14,
-                            outline: "none"
-                        }}
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={pass}
-                        onChange={(e) => setPass(e.target.value)}
-                        style={{
-                            background: "rgba(255,255,255,0.05)",
-                            border: `1px solid ${C.border}`,
-                            padding: "16px",
-                            borderRadius: 12,
-                            color: "#fff",
-                            fontSize: 14,
-                            outline: "none"
-                        }}
-                    />
-
-                    <button
-                        onClick={handleLogin}
-                        style={{
-                            background: C.accent,
-                            color: "#000",
-                            border: "none",
-                            padding: "18px",
-                            borderRadius: 12,
-                            fontWeight: 900,
-                            fontSize: 16,
-                            cursor: "pointer",
-                            marginTop: 8,
-                            boxShadow: `0 10px 20px ${C.accent}44`
-                        }}
-                    >
-                        {config.primaryBtn}
-                    </button>
+                <div style={{ fontSize: 64, marginBottom: 20 }}>
+                    {config.icon}
                 </div>
-            ) : (
+
+                <h2 style={{ color: "#fff", fontSize: 28, fontWeight: 900, marginBottom: 8 }}>
+                    {config.title}
+                </h2>
+
+                <p style={{ color: C.muted, fontSize: 14, marginBottom: 40 }}>
+                    {config.desc}
+                </p>
+
+                {/* Email Input */}
+                <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                        width: "100%",
+                        background: "rgba(255,255,255,0.05)",
+                        border: `1px solid ${C.border}`,
+                        padding: "16px",
+                        borderRadius: 12,
+                        color: "#fff",
+                        fontSize: 14,
+                        outline: "none",
+                        marginBottom: 16
+                    }}
+                />
+
+                {/* Password Input */}
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={pass}
+                    onChange={(e) => setPass(e.target.value)}
+                    style={{
+                        width: "100%",
+                        background: "rgba(255,255,255,0.05)",
+                        border: `1px solid ${C.border}`,
+                        padding: "16px",
+                        borderRadius: 12,
+                        color: "#fff",
+                        fontSize: 14,
+                        outline: "none",
+                        marginBottom: 20
+                    }}
+                />
+
+                {/* Animated Login Button */}
                 <button
                     onClick={handleLogin}
                     style={{
-                        background: role === "admin" ? C.text : "#a855f7",
+                        width: "100%",
+                        background: getButtonColor(),
                         color: "#000",
                         border: "none",
                         padding: "18px",
@@ -159,20 +157,36 @@ export default function Login() {
                         fontWeight: 900,
                         fontSize: 16,
                         cursor: "pointer",
-                        boxShadow: "0 10px 30px rgba(168,85,247,0.3)"
+                        boxShadow: `0 8px 20px ${getButtonColor()}44`,
+                        transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-3px) scale(1.03)";
+                        e.currentTarget.style.boxShadow = `0 12px 30px ${getButtonColor()}66`;
+                        e.currentTarget.style.filter = "brightness(1.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0) scale(1)";
+                        e.currentTarget.style.boxShadow = `0 8px 20px ${getButtonColor()}44`;
+                        e.currentTarget.style.filter = "brightness(1)";
+                    }}
+                    onMouseDown={(e) => {
+                        e.currentTarget.style.transform = "translateY(1px) scale(0.98)";
+                    }}
+                    onMouseUp={(e) => {
+                        e.currentTarget.style.transform = "translateY(-3px) scale(1.03)";
                     }}
                 >
-                    {config.primaryBtn}
+                    Login to Portal
                 </button>
-            )}
 
-            <div style={{ marginTop: 40, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
-                <span style={{ color: C.muted, fontSize: 13 }}>{config.altText} </span>
-                <span style={{ color: C.accent, fontSize: 13, fontWeight: 700 }}>
-                    {config.altLink}
-                </span>
+                <div style={{ marginTop: 40, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
+                    <span style={{ color: C.muted, fontSize: 13 }}>
+                        Need access? Contact your administrator.
+                    </span>
+                </div>
+
             </div>
-
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { C } from "../constants/theme";
 import { useNavigate } from "react-router-dom";
-
+import { useState, useEffect } from "react";
 
 const FeatureCard = ({ title, desc, icon }) => (
     <div style={{
@@ -53,11 +53,17 @@ const DetailSection = ({ title, text, color = C.accent }) => (
     </div>
 );
 
+
 export default function Home({ onGetStarted }) {
     const navigate = useNavigate();
 
+    const [showTitle, setShowTitle] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setShowTitle(true), 200);
+    }, []);
     return (
-        <div style={{ background: C.bg, minHeight: "100vh" }}>
+        <div style={{ minHeight: "100vh" }}>
             {/* Hero Section */}
             <section style={{
                 padding: "160px 24px 100px",
@@ -92,10 +98,34 @@ export default function Home({ onGetStarted }) {
                     fontWeight: 900,
                     lineHeight: 1,
                     maxWidth: 900,
-                    letterSpacing: -2
+                    letterSpacing: -2,
+                    overflow: "hidden"
                 }}>
-                    Process Claims in <br />
-                    <span style={{ color: C.accent }}>Minutes, Not Months</span>
+                    <span
+                        style={{
+                            display: "block",
+                            transform: showTitle ? "translateY(0)" : "translateY(60px)",
+                            opacity: showTitle ? 1 : 0,
+                            filter: showTitle ? "blur(0px)" : "blur(6px)",
+                            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+                        }}
+                    >
+                        Process Claims in
+                    </span>
+
+                    <span
+                        style={{
+                            display: "block",
+                            color: C.accent,
+                            transform: showTitle ? "translateY(0)" : "translateY(80px)",
+                            opacity: showTitle ? 1 : 0,
+                            filter: showTitle ? "blur(0px)" : "blur(6px)",
+                            transition: "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
+                            transitionDelay: "0.2s"
+                        }}
+                    >
+                        Minutes, Not Months
+                    </span>
                 </h1>
 
                 <p style={{
@@ -108,7 +138,18 @@ export default function Home({ onGetStarted }) {
                     Intelligent automation with fraud detection, policy validation & instant approvals for trusted insurance providers.
                 </p>
 
-                <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: 20,
+                        marginTop: 20,
+                        transform: showTitle ? "translateY(0)" : "translateY(60px)",
+                        opacity: showTitle ? 1 : 0,
+                        filter: showTitle ? "blur(0px)" : "blur(6px)",
+                        transition: "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
+                        transitionDelay: "0.4s"
+                    }}
+                >
                     <button
                         onClick={() => navigate("/role-select")}
                         style={{
@@ -116,15 +157,23 @@ export default function Home({ onGetStarted }) {
                             color: "#000",
                             border: "none",
                             padding: "20px 48px",
-                            borderRadius: 12,
+                            borderRadius: 14,
                             fontSize: 20,
                             fontWeight: 900,
                             cursor: "pointer",
                             boxShadow: `0 10px 30px ${C.accent}44`,
-                            transition: "all 0.2s"
+                            transition: "all 0.3s ease",
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateY(-4px) scale(1.04)";
+                            e.currentTarget.style.boxShadow = `0 18px 45px ${C.accent}88`;
+                            e.currentTarget.style.filter = "brightness(1.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0) scale(1)";
+                            e.currentTarget.style.boxShadow = `0 10px 30px ${C.accent}44`;
+                            e.currentTarget.style.filter = "brightness(1)";
+                        }}
                     >
                         Get Started →
                     </button>
