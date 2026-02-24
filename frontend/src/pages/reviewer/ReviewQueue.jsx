@@ -22,7 +22,8 @@ export default function ReviewQueue() {
                 setClaims(response.claims || []);
             } catch (err) {
                 console.error("Queue fetch error:", err);
-                setError(err.message);
+                setClaims([]);
+                setError("Failed to fetch reviewer queue.");
             } finally {
                 setLoading(false);
             }

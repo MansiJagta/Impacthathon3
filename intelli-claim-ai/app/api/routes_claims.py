@@ -53,39 +53,37 @@ def _first(value: Any) -> Any:
 
 
 def _infer_claim_data_from_node1(node1_output: dict[str, Any]) -> dict[str, Any]:
-	documents = node1_output.get("documents", []) if isinstance(node1_output, dict) else []
-	policy_number: str | None = None
-	claim_amount: float | None = None
-	claimer_name: str | None = None
-	claimer_address: str | None = None
-
-	for doc in documents:
-		fields = doc.get("structured_fields", {}) if isinstance(doc, dict) else {}
-		doc_type = doc.get("document_type") if isinstance(doc, dict) else None
-
-		if not claimer_name:
-			claimer_name = fields.get("claimer_name")
-		if not claimer_address:
-			claimer_address = fields.get("claimer_address")
-		if not policy_number:
-			policy_number = _first(fields.get("policy_number"))
-
-		if doc_type == "bill" and claim_amount is None:
-			raw_amount = _first(fields.get("amount"))
-			try:
-				claim_amount = float(raw_amount) if raw_amount is not None else None
-			except (TypeError, ValueError):
-				claim_amount = None
+	entities = node1_output.get("extracted_entities", {})
+	
+	# Prefer entities if they exist (new structured output)
+	policy_number = entities.get("policy_number")
+	claim_amount = entities.get("total_amount") or entities.get("amount")
+	claimer_name = entities.get("claimer_name")
+	claimer_address = entities.get("address")
+	claimer_phone = entities.get("phone")
+	claimer_email = entities.get("email")
+	aadhaar_id = entities.get("aadhaar_id")
+	diagnosis = entities.get("diagnosis")
+	hospital_name = entities.get("hospital_name")
+	admission_date = entities.get("admission_date") or entities.get("date")
 
 	return {
 		"policy_number": policy_number,
 		"claim_amount": claim_amount,
 		"claimer_name": claimer_name,
 		"claimer_address": claimer_address,
+		"claimer_phone": claimer_phone,
+		"claimer_email": claimer_email,
+		"aadhaar_id": aadhaar_id,
+		"diagnosis": diagnosis,
+		"hospital_name": hospital_name,
+		"admission_date": admission_date,
 	}
 
 
 def _build_submit_response(claim_id: str, final_state: dict[str, Any]) -> dict[str, Any]:
+	node1 = final_state.get("node1_output", {})
+	node2 = final_state.get("node2_output", {})
 	node3 = final_state.get("node3_output", {})
 	node4 = final_state.get("node4_output", {})
 	node6 = final_state.get("node6_output", {})
@@ -104,6 +102,12 @@ def _build_submit_response(claim_id: str, final_state: dict[str, Any]) -> dict[s
 		"covered": bool(node3.get("is_covered", False)),
 		"covered_amount": node3.get("covered_amount"),
 		"explanation": node6.get("explanation_text"),
+		# Reliability Metadata
+		"extracted_entities": node1.get("extracted_entities"),
+		"field_confidence": node1.get("field_confidence"),
+		"policy_match_confidence": node3.get("policy_match_confidence"),
+		"document_consistency_score": node2.get("consistency_score"),
+		"final_decision": status
 	}
 
 
@@ -124,6 +128,7 @@ def _persist_claim(claim_payload: dict[str, Any], final_state: dict[str, Any], c
 			"claim_amount": claim_payload["claim_amount"],
 			"policy_number": claim_payload["policy_number"],
 			"claimer": claim_payload["claimer"],
+			"medical": claim_payload.get("medical", {}),
 			"form_data": claim_payload.get("form_data", {}),
 			"document_paths": claim_payload["document_paths"],
 			"status": status,
@@ -162,33 +167,64 @@ def _to_summary(doc: dict[str, Any]) -> ClaimSummary:
 
 
 def _build_reasoning(doc: dict[str, Any]) -> list[ClaimReasoningItem]:
+	node6 = doc.get("node6_output", {})
+	if "reasoning_steps" in node6:
+		return [
+			ClaimReasoningItem(
+				node=step.get("node", "Unknown Node"),
+				finding=step.get("finding", ""),
+				confidence=step.get("confidence", 0.0)
+			) for step in node6["reasoning_steps"]
+		]
+
+	# Fallback legacy logic
+	node1 = doc.get("node1_output", {})
 	node2 = doc.get("node2_output", {})
 	node3 = doc.get("node3_output", {})
 	node4 = doc.get("node4_output", {})
 	node5 = doc.get("node5_output", {})
 
-	items = [
-		ClaimReasoningItem(
-			node="Cross Validation",
-			finding=str(node2.get("reason") or "Documents validated"),
-			confidence=node2.get("confidence"),
-		),
-		ClaimReasoningItem(
-			node="Policy Coverage",
-			finding="Covered" if node3.get("is_covered") else str(node3.get("reason") or "Not covered"),
-			confidence=node3.get("confidence"),
-		),
-		ClaimReasoningItem(
-			node="Fraud Detection",
-			finding=str(node4.get("reasoning") or (", ".join(node4.get("fraud_indicators", [])) or "No major anomaly")),
-			confidence=node4.get("confidence") or node4.get("fraud_score"),
-		),
-		ClaimReasoningItem(
-			node="Predictive Analysis",
-			finding=str(node5.get("summary") or "Predictive model assessed claim"),
-			confidence=node5.get("confidence"),
-		),
-	]
+	items = []
+
+	# Node 1
+	n1_reasoning = node1.get("reasoning", [])
+	if n1_reasoning:
+		items.append(ClaimReasoningItem(
+			node="Document Extraction",
+			finding=n1_reasoning[0].get("finding", "Docs processed"),
+			confidence=n1_reasoning[0].get("confidence", 0.95),
+		))
+
+	# Node 2
+	items.append(ClaimReasoningItem(
+		node="Cross Validation",
+		finding=str(node2.get("finding") or node2.get("reason") or "Documents validated"),
+		confidence=node2.get("consistency_score") or node2.get("confidence") or 0.5,
+	))
+
+	# Node 3
+	items.append(ClaimReasoningItem(
+		node="Policy Coverage",
+		finding="Covered" if node3.get("is_covered") else str(node3.get("reason") or "Not covered"),
+		confidence=node3.get("policy_match_confidence") or node3.get("confidence") or 0.5,
+	))
+
+	# Node 4
+	fraud_finding = f"Risk level: {node4.get('risk_level', 'UNKNOWN')}. "
+	fraud_finding += str(node4.get("reasoning") or (", ".join(node4.get("fraud_indicators", [])) or "No major anomaly"))
+	items.append(ClaimReasoningItem(
+		node="Fraud Detection",
+		finding=fraud_finding,
+		confidence=1.0 - node4.get("fraud_score", 0.0),
+	))
+
+	# Node 5
+	items.append(ClaimReasoningItem(
+		node="Predictive Analysis",
+		finding=str(node5.get("summary") or "Predictive model assessed claim"),
+		confidence=node5.get("confidence") or 0.8,
+	))
+
 	return items
 
 
@@ -280,9 +316,24 @@ async def submit_claim_with_upload(
 			except (ValueError, TypeError):
 				final_claim_amount = 0.0
 
-		final_claimer_name = claimer_name or inferred.get("claimer_name") or "Unknown Claimer"
-		final_claimer_address = claimer_address or inferred.get("claimer_address")
-		final_claimer_email = claimer_email or "unknown@example.com"
+		# Extracted data takes precedence over login/form data as per user request
+		final_claimer_name = inferred.get("claimer_name") or claimer_name or "Unknown Claimer"
+		final_claimer_address = inferred.get("claimer_address") or claimer_address
+		final_claimer_email = inferred.get("claimer_email") or claimer_email or "unknown@example.com"
+		
+		# Metadata exposure for frontend
+		extraction_metadata = {
+			"field_confidence": final_state.get("node1_output", {}).get("field_confidence"),
+			"policy_match_confidence": final_state.get("node3_output", {}).get("policy_match_confidence"),
+			"document_consistency_score": final_state.get("node2_output", {}).get("consistency_score")
+		}
+
+		# Prepare final form_data including metadata for gauges
+		final_form_data = {
+			"auto_extracted": True,
+			"node1_output": final_state.get("node1_output", {}),
+			**extraction_metadata
+		}
 
 		_persist_claim(
 			{
@@ -292,13 +343,16 @@ async def submit_claim_with_upload(
 				"claimer": {
 					"name": final_claimer_name,
 					"email": final_claimer_email,
-					"phone": claimer_phone,
+					"phone": claimer_phone or inferred.get("claimer_phone"),
 					"address": final_claimer_address,
+					"aadhaar_id": inferred.get("aadhaar_id"),
 				},
-				"form_data": {
-					"auto_extracted": True,
-					"node1_output": final_state.get("node1_output", {}),
+				"medical": {
+					"hospital": inferred.get("hospital_name"),
+					"admission_date": inferred.get("admission_date"),
+					"diagnosis": inferred.get("diagnosis"),
 				},
+				"form_data": final_form_data,
 				"document_paths": saved_paths,
 			},
 			final_state,
@@ -370,6 +424,7 @@ def get_claim_details(claim_id: str):
 		raise HTTPException(status_code=404, detail="Claim not found")
 
 	claimer = doc.get("claimer") or {}
+	medical = doc.get("medical") or {}
 	fraud_score = float(doc.get("fraud_score", 0.0) or 0.0)
 	decision = doc.get("node7_output", {})
 
@@ -379,15 +434,21 @@ def get_claim_details(claim_id: str):
 		claim_amount=float(doc.get("claim_amount", 0.0) or 0.0),
 		status=doc.get("status", "PENDING_REVIEW"),
 		ai_decision=decision.get("final_status"),
-		confidence=doc.get("node3_output", {}).get("confidence"),
+		confidence=doc.get("node1_output", {}).get("overall_confidence", 0.95),
 		fraud_score=fraud_score,
 		risk_score=float(doc.get("risk_score", _risk_score_from_fraud(fraud_score))),
 		policy_number=doc.get("policy_number"),
+		hospital=medical.get("hospital"),
+		admission_date=medical.get("admission_date"),
+		discharge_date=medical.get("discharge_date"),
+		diagnosis=medical.get("diagnosis"),
+		claimed_amount=doc.get("claim_amount"),
 		claimer={
 			"name": claimer.get("name", ""),
 			"email": claimer.get("email", ""),
 			"phone": claimer.get("phone"),
 			"address": claimer.get("address"),
+			"aadhaar_id": claimer.get("aadhaar_id"),
 		},
 		metadata=doc.get("form_data", {}),
 		reasoning=_build_reasoning(doc),

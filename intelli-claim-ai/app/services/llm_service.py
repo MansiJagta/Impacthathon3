@@ -1,24 +1,34 @@
 import json
 import os
 import requests
-from typing import Any, Dict, List
+import base64
+from typing import Any, Dict, List, Optional
 
 class LLMService:
     def __init__(self):
         self.base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.model = "gemma3:4b"  # Found on user's system
 
-    def _call_ollama(self, prompt: str, system_prompt: str = "") -> str:
+    def _call_ollama(self, prompt: str, system_prompt: str = "", images: Optional[List[str]] = None) -> str:
         url = f"{self.base_url}/api/generate"
+        
+        # Use bakllava if images are provided, otherwise use default gemma3
+        current_model = "bakllava" if images else self.model
+        
         payload = {
-            "model": self.model,
+            "model": current_model,
             "prompt": prompt,
             "system": system_prompt,
             "stream": False,
             "format": "json"
         }
+        
+        if images:
+            payload["images"] = images
+            
         try:
-            response = requests.post(url, json=payload, timeout=60)
+            print(f"DEBUG: Calling Ollama with model: {current_model}")
+            response = requests.post(url, json=payload, timeout=90) # Increased timeout for vision
             response.raise_for_status()
             res_text = response.json().get("response", "")
             print(f"DEBUG: Ollama Raw Response: {res_text[:200]}")
@@ -27,34 +37,35 @@ class LLMService:
             print(f"Ollama Call Error: {e}")
             return ""
 
-    def extract_structured_data(self, text: str, document_type: str) -> Dict[str, Any]:
+    def extract_structured_data(self, text: str, document_type: str, image_path: Optional[str] = None) -> Dict[str, Any]:
         """
-        Extract structured information from OCR text using local Ollama.
+        Extract structured information from OCR text and optionally an image using local Ollama.
         """
-        system_prompt = "You are an expert insurance claim adjuster. Your task is to extract structured data from OCR text and return ONLY a valid JSON object."
+        from app.nodes.node1_extraction.extraction_prompt import EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT_TEMPLATE
         
-        prompt = f"""
-        Extract the following information from the provided OCR text of a {document_type} document.
-        Return the data in a valid JSON format with these exact keys:
-        - claimer_name (Full name of the person)
-        - claimer_email
-        - claimer_phone
-        - claimer_address
-        - policy_number
-        - amount (Numerical value only)
-        - date (DD/MM/YYYY)
-        - summary (Brief description of content)
+        prompt = EXTRACTION_USER_PROMPT_TEMPLATE.format(text=text[:4000]) # Increased context window
 
-        OCR Text:
-        {text[:2000]}
-        """
+        images = None
+        if image_path and os.path.exists(image_path):
+            try:
+                with open(image_path, "rb") as f:
+                    img_base64 = base64.b64encode(f.read()).decode("utf-8")
+                    images = [img_base64]
+                print(f"DEBUG: Including image from {image_path} for vision extraction.")
+            except Exception as e:
+                print(f"Error reading image for Ollama: {e}")
 
-        raw_response = self._call_ollama(prompt, system_prompt)
+        raw_response = self._call_ollama(prompt, EXTRACTION_SYSTEM_PROMPT, images=images)
         try:
-            return json.loads(raw_response)
+            data = json.loads(raw_response)
+            # Ensure confidence exists
+            if "confidence" not in data:
+                data["confidence"] = 0.8
+            return data
         except Exception as e:
             print(f"Ollama JSON Parse Error: {e}\nRaw: {raw_response}")
             return {}
+
 
     def analyze_claim_context(self, documents_context: str) -> Dict[str, Any]:
         """

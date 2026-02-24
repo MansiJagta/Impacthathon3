@@ -3,23 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 const FeatureCard = ({ title, desc, icon }) => (
-    <div style={{
-        background: C.panel,
-        border: `1px solid ${C.border}`,
-        borderRadius: 24,
-        padding: "40px",
-        flex: 1,
-        minWidth: 280,
-        display: "flex",
-        flexDirection: "column",
-        gap: 20,
-        transition: "all 0.3s ease",
-        cursor: "default"
-    }}
+    <div
+        style={{
+            background: C.panel,
+            border: `1px solid ${C.border}`,
+            borderRadius: 24,
+            padding: "40px",
+            flex: 1,
+            minWidth: 280,
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+            transition: "all 0.3s ease",
+            cursor: "default",
+            backdropFilter: "blur(6px)",
+        }}
         onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-8px)";
             e.currentTarget.style.borderColor = C.accent;
-            e.currentTarget.style.boxShadow = `0 12px 30px ${C.accent}11`;
+            e.currentTarget.style.boxShadow = `0 12px 30px ${C.accent}22`;
         }}
         onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
@@ -27,87 +29,99 @@ const FeatureCard = ({ title, desc, icon }) => (
             e.currentTarget.style.boxShadow = "none";
         }}
     >
-        <div style={{
-            fontSize: 40,
-            background: `${C.accent}11`,
-            width: 80,
-            height: 80,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 20,
-            marginBottom: 10
-        }}>{icon}</div>
-        <h3 style={{ color: C.text, fontSize: 24, fontWeight: 800 }}>{title}</h3>
-        <p style={{ color: C.muted, fontSize: 16, lineHeight: 1.6 }}>{desc}</p>
-    </div>
-);
+        <div
+            style={{
+                fontSize: 40,
+                background: `${C.accent}11`,
+                width: 80,
+                height: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 20,
+            }}
+        >
+            {icon}
+        </div>
 
-const DetailSection = ({ title, text, color = C.accent }) => (
-    <div style={{ flex: 1, minWidth: 300 }}>
-        <h3 style={{ color: C.text, fontSize: 32, fontWeight: 900, marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ width: 4, height: 32, background: color, borderRadius: 2 }}></span>
+        <h3 style={{ color: C.text, fontSize: 24, fontWeight: 800 }}>
             {title}
         </h3>
-        <p style={{ color: C.muted, fontSize: 18, lineHeight: 1.8 }}>{text}</p>
+
+        <p style={{ color: C.muted, fontSize: 16, lineHeight: 1.6 }}>
+            {desc}
+        </p>
     </div>
 );
 
-
-export default function Home({ onGetStarted }) {
+export default function Home() {
     const navigate = useNavigate();
-
     const [showTitle, setShowTitle] = useState(false);
 
     useEffect(() => {
         setTimeout(() => setShowTitle(true), 200);
     }, []);
+
     return (
-        <div style={{ minHeight: "100vh" }}>
-            {/* Hero Section */}
-            <section style={{
-                padding: "160px 24px 100px",
-                textAlign: "left",
-                maxWidth: 1200,
-                margin: "0 auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: 32
-            }}>
-                <div style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    background: `${C.accent}22`,
-                    border: `1px solid ${C.accent}44`,
-                    padding: "8px 20px",
-                    borderRadius: 30,
-                    color: C.accent,
-                    fontSize: 13,
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                    letterSpacing: 1.5,
-                    alignSelf: "flex-start"
-                }}>
+        <div
+            style={{
+                minHeight: "100vh",
+                backgroundImage:
+                    "linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1559526324-593bc073d938')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundAttachment: "fixed",
+            }}
+        >
+            {/* HERO */}
+            <section
+                style={{
+                    padding: "160px 24px 100px",
+                    maxWidth: 1200,
+                    margin: "0 auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 32,
+                }}
+            >
+                <div
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        background: `${C.accent}22`,
+                        border: `1px solid ${C.accent}44`,
+                        padding: "8px 20px",
+                        borderRadius: 30,
+                        color: C.accent,
+                        fontSize: 13,
+                        fontWeight: 800,
+                        textTransform: "uppercase",
+                        letterSpacing: 1.5,
+                        alignSelf: "flex-start",
+                    }}
+                >
                     🛡️ AI-Powered Insurance Validation
                 </div>
 
-                <h1 style={{
-                    color: "#fff",
-                    fontSize: 84,
-                    fontWeight: 900,
-                    lineHeight: 1,
-                    maxWidth: 900,
-                    letterSpacing: -2,
-                    overflow: "hidden"
-                }}>
+                <h1
+                    style={{
+                        color: "#fff",
+                        fontSize: 84,
+                        fontWeight: 900,
+                        lineHeight: 1,
+                        letterSpacing: -2,
+                        overflow: "hidden",
+                    }}
+                >
                     <span
                         style={{
                             display: "block",
-                            transform: showTitle ? "translateY(0)" : "translateY(60px)",
+                            transform: showTitle
+                                ? "translateY(0)"
+                                : "translateY(60px)",
                             opacity: showTitle ? 1 : 0,
-                            filter: showTitle ? "blur(0px)" : "blur(6px)",
-                            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+                            transition: "all 0.8s ease",
                         }}
                     >
                         Process Claims in
@@ -117,25 +131,28 @@ export default function Home({ onGetStarted }) {
                         style={{
                             display: "block",
                             color: C.accent,
-                            transform: showTitle ? "translateY(0)" : "translateY(80px)",
+                            transform: showTitle
+                                ? "translateY(0)"
+                                : "translateY(80px)",
                             opacity: showTitle ? 1 : 0,
-                            filter: showTitle ? "blur(0px)" : "blur(6px)",
-                            transition: "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
-                            transitionDelay: "0.2s"
+                            transition: "all 1s ease",
+                            transitionDelay: "0.2s",
                         }}
                     >
                         Minutes, Not Months
                     </span>
                 </h1>
 
-                <p style={{
-                    color: C.muted,
-                    fontSize: 22,
-                    maxWidth: 650,
-                    lineHeight: 1.6,
-                    fontWeight: 500
-                }}>
-                    Intelligent automation with fraud detection, policy validation & instant approvals for trusted insurance providers.
+                <p
+                    style={{
+                        color: C.muted,
+                        fontSize: 22,
+                        maxWidth: 650,
+                        lineHeight: 1.6,
+                    }}
+                >
+                    Intelligent automation with fraud detection, policy validation &
+                    instant approvals for trusted insurance providers.
                 </p>
 
                 <div
@@ -143,11 +160,6 @@ export default function Home({ onGetStarted }) {
                         display: "flex",
                         gap: 20,
                         marginTop: 20,
-                        transform: showTitle ? "translateY(0)" : "translateY(60px)",
-                        opacity: showTitle ? 1 : 0,
-                        filter: showTitle ? "blur(0px)" : "blur(6px)",
-                        transition: "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
-                        transitionDelay: "0.4s"
                     }}
                 >
                     <button
@@ -164,40 +176,43 @@ export default function Home({ onGetStarted }) {
                             boxShadow: `0 10px 30px ${C.accent}44`,
                             transition: "all 0.3s ease",
                         }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = "translateY(-4px) scale(1.04)";
-                            e.currentTarget.style.boxShadow = `0 18px 45px ${C.accent}88`;
-                            e.currentTarget.style.filter = "brightness(1.05)";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "translateY(0) scale(1)";
-                            e.currentTarget.style.boxShadow = `0 10px 30px ${C.accent}44`;
-                            e.currentTarget.style.filter = "brightness(1)";
-                        }}
+                        onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform =
+                            "translateY(-4px) scale(1.04)")
+                        }
+                        onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform =
+                            "translateY(0) scale(1)")
+                        }
                     >
                         Get Started →
                     </button>
-                    <button style={{
-                        background: "rgba(255,255,255,0.05)",
-                        color: "#fff",
-                        border: `1px solid ${C.border}`,
-                        padding: "20px 40px",
-                        borderRadius: 12,
-                        fontSize: 20,
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        transition: "all 0.2s"
-                    }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-                        onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+
+                    <button
+                        style={{
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#fff",
+                            border: `1px solid ${C.border}`,
+                            padding: "20px 40px",
+                            borderRadius: 12,
+                            fontSize: 20,
+                            fontWeight: 700,
+                            cursor: "pointer",
+                        }}
                     >
                         Watch Demo
                     </button>
                 </div>
             </section>
 
-            {/* Feature Cards Section */}
-            <section style={{ padding: "120px 24px", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, background: "rgba(0,0,0,0.2)" }}>
+            {/* FEATURES */}
+            <section
+                style={{
+                    padding: "120px 24px",
+                    borderTop: `1px solid ${C.border}`,
+                    borderBottom: `1px solid ${C.border}`,
+                }}
+            >
                 <div
                     style={{
                         maxWidth: 1200,
@@ -209,51 +224,69 @@ export default function Home({ onGetStarted }) {
                 >
                     <FeatureCard
                         title="Claims Processing"
-                        desc="Resolve most claims automatically, in real time, freeing claims handlers to manage complex and sensitive claims faster."
+                        desc="Resolve most claims automatically in real time."
                         icon="🏥"
                     />
                     <FeatureCard
                         title="Fraud Detection"
-                        desc="Automatically identify anomalies and unusual patterns. Ensure handlers have the time and insights to intercept fraud."
+                        desc="Identify anomalies and intercept fraud instantly."
                         icon="🔍"
                     />
                     <FeatureCard
                         title="Policy Validation"
-                        desc="Instantly verify coverage details and policy limits against current database to ensure accurate processing."
+                        desc="Verify coverage and limits instantly."
                         icon="🛡️"
                     />
                     <FeatureCard
                         title="Instant Approvals"
-                        desc="Low-risk claims are approved instantly, providing immediate satisfaction and reducing manual backlog."
+                        desc="Low-risk claims approved immediately."
                         icon="⚡"
                     />
                 </div>
             </section>
 
-            {/* Industries Section */}
+            {/* INDUSTRIES */}
             <section style={{ padding: "100px 24px" }}>
                 <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
-                    <h2 style={{ color: "#fff", fontSize: 40, fontWeight: 900, marginBottom: 60, letterSpacing: -1 }}>Supported Industries</h2>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }}>
-                        {["Health & Life", "Motor & Auto", "Home & Property"].map(industry => (
-                            <div key={industry} style={{
-                                flex: 1,
-                                padding: "40px 24px",
-                                background: C.panel,
-                                border: `1px solid ${C.border}`,
-                                borderRadius: 20,
-                                fontWeight: 800,
-                                color: "#fff",
-                                fontSize: 18,
-                                minWidth: 200,
-                                transition: "all 0.3s ease"
-                            }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderColor = C.accent}
-                                onMouseLeave={(e) => e.currentTarget.style.borderColor = C.border}
-                            >
-                                {industry}
-                            </div>
-                        ))}
+                    <h2
+                        style={{
+                            color: "#fff",
+                            fontSize: 40,
+                            fontWeight: 900,
+                            marginBottom: 60,
+                        }}
+                    >
+                        Supported Industries
+                    </h2>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            gap: 32,
+                            flexWrap: "wrap",
+                        }}
+                    >
+                        {["Health & Life", "Motor & Auto", "Home & Property"].map(
+                            (industry) => (
+                                <div
+                                    key={industry}
+                                    style={{
+                                        flex: 1,
+                                        padding: "40px 24px",
+                                        background: C.panel,
+                                        border: `1px solid ${C.border}`,
+                                        borderRadius: 20,
+                                        fontWeight: 800,
+                                        color: "#fff",
+                                        minWidth: 200,
+                                        backdropFilter: "blur(6px)",
+                                    }}
+                                >
+                                    {industry}
+                                </div>
+                            )
+                        )}
                     </div>
                 </div>
             </section>
