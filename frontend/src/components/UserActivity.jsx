@@ -11,11 +11,12 @@ export default function UserActivity() {
         async function fetchActivity() {
             setLoading(true);
             try {
-                const data = await api.getUserActivity();
-                setActivities(data.activities || []);
+                const response = await api.getUserActivity();
+                // API returns { count, users: [...] }
+                setActivities(response.users || []);
             } catch (err) {
                 console.error("Error fetching user activity:", err);
-                setError(err.message);
+                setError("Failed to load global activity.");
             } finally {
                 setLoading(false);
             }
@@ -48,11 +49,11 @@ export default function UserActivity() {
                     <tbody>
                         {activities.length > 0 ? activities.map((u, i) => (
                             <tr key={i} style={{ borderBottom: `1px solid ${C.border}` }}>
-                                <td style={tdStyle}>{u.name}</td>
-                                <td style={tdStyle}>{u.role === 'claimer' ? '👤 Claimer' : '⚖ Reviewer'}</td>
-                                <td style={tdStyle}>{u.claims_count}</td>
+                                <td style={tdStyle}>{u.user || u.email}</td>
+                                <td style={tdStyle}>{u.role === 'Claimer' ? '👤 Claimer' : '⚖ Reviewer'}</td>
+                                <td style={tdStyle}>{u.claims}</td>
                                 <td style={{ ...tdStyle, color: u.approval_rate > 70 ? C.green : C.yellow, fontWeight: 800 }}>{u.approval_rate}%</td>
-                                <td style={{ ...tdStyle, color: C.muted }}>{u.last_active}</td>
+                                <td style={{ ...tdStyle, color: C.muted }}>{u.last_active ? new Date(u.last_active).toLocaleString() : 'N/A'}</td>
                             </tr>
                         )) : (
                             <tr>

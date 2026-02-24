@@ -12,12 +12,12 @@ export default function ReviewerHistory() {
         async function fetchHistory() {
             setLoading(true);
             try {
-                // For "All Processed Claims", we list all claims but maybe filter by processed status if API allows
                 const response = await api.listClaims({});
                 setClaims(response.claims || []);
             } catch (err) {
                 console.error("Error fetching history:", err);
-                setError(err.message);
+                setError("Failed to fetch claim history.");
+                setClaims([]);
             } finally {
                 setLoading(false);
             }
