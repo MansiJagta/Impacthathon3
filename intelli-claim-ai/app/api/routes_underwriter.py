@@ -32,12 +32,15 @@ def _badge_for_status(status: str) -> str:
 		return "Approved"
 	if status == "REJECTED":
 		return "Rejected"
+	if status == "SENT_FOR_RELEARNING":
+		return "Relearning"
 	if status in {"FLAGGED_FOR_REVIEW", "ESCALATED_FRAUD_REVIEW"}:
 		return "Flagged"
 	return "Pending"
 
 
 def _to_summary(row: dict[str, Any]) -> ClaimSummary:
+	review = row.get("review") or {}
 	return ClaimSummary(
 		claim_id=row.get("claim_id", ""),
 		claim_type=row.get("claim_type", "Unknown"),
@@ -48,6 +51,7 @@ def _to_summary(row: dict[str, Any]) -> ClaimSummary:
 		risk_score=float(row.get("risk_score", row.get("fraud_score", 0.0)) or 0.0),
 		created_at=row.get("created_at"),
 		summary=row.get("decision_reason") or row.get("status"),
+		review_note=review.get("note"),
 	)
 
 
@@ -75,10 +79,14 @@ def review_claim(claim_id: str, payload: ReviewerDecisionRequest):
 	if not claim:
 		raise HTTPException(status_code=404, detail="Claim not found")
 
+	if payload.decision == "send_for_relearning" and not (payload.note and payload.note.strip()):
+		raise HTTPException(status_code=400, detail="Note is required when sending claim for relearning")
+
 	status_mapping = {
 		"approve": "APPROVED",
 		"reject": "REJECTED",
 		"request_more_info": "REQUESTED_MORE_INFO",
+		"send_for_relearning": "SENT_FOR_RELEARNING",
 	}
 	new_status = status_mapping[payload.decision]
 

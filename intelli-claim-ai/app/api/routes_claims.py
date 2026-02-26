@@ -38,6 +38,7 @@ def _badge_for_status(status: str) -> str:
 		"FLAGGED_FOR_REVIEW": "Flagged",
 		"ESCALATED_FRAUD_REVIEW": "Flagged",
 		"REQUESTED_MORE_INFO": "Pending",
+		"SENT_FOR_RELEARNING": "Relearning",
 	}
 	return mapping.get(status, "Pending")
 
@@ -153,6 +154,7 @@ def _persist_claim(claim_payload: dict[str, Any], final_state: dict[str, Any], c
 def _to_summary(doc: dict[str, Any]) -> ClaimSummary:
 	status = doc.get("status", "PENDING_REVIEW")
 	fraud_score = float(doc.get("fraud_score", 0.0) or 0.0)
+	review = doc.get("review") or {}
 	return ClaimSummary(
 		claim_id=doc.get("claim_id", ""),
 		claim_type=doc.get("claim_type", "Unknown"),
@@ -163,6 +165,7 @@ def _to_summary(doc: dict[str, Any]) -> ClaimSummary:
 		risk_score=_risk_score_from_fraud(fraud_score),
 		created_at=doc.get("created_at"),
 		summary=doc.get("decision_reason") or doc.get("status"),
+		review_note=review.get("note"),
 	)
 
 

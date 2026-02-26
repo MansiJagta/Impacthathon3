@@ -34,6 +34,12 @@ export default function ReviewQueue() {
     }, []);
 
     const handleAction = async (claimId, decision) => {
+        const note = notes[claimId] || "";
+        if (decision === "send_for_relearning" && !note.trim()) {
+            alert("Please add a note explaining why this claim is being sent for relearning.");
+            return;
+        }
+
         setIsSubmitting(claimId);
         try {
             const userRole = localStorage.getItem("userRole") || "reviewer";
@@ -41,12 +47,18 @@ export default function ReviewQueue() {
 
             await api.submitReviewDecision(claimId, {
                 decision,
-                note: notes[claimId] || "",
+                note,
                 reviewer_name: userRole,
                 reviewer_email: userEmail
             });
 
-            alert(`Claim ${decision}ed successfully!`);
+            const actionLabel = {
+                approve: "approved",
+                reject: "rejected",
+                request_more_info: "marked for more info",
+                send_for_relearning: "sent for relearning"
+            };
+            alert(`Claim ${actionLabel[decision] || decision} successfully!`);
             setClaims(prev => prev.filter(c => c.claim_id !== claimId));
         } catch (err) {
             alert(`Failed to save decision: ${err.message}`);
@@ -174,7 +186,7 @@ export default function ReviewQueue() {
                             ))}
 
                             <textarea
-                                placeholder="Add notes (optional)…"
+                                placeholder="Add reviewer note (required for relearning)…"
                                 value={notes[claim.claim_id] || ""}
                                 onChange={(e) => handleNoteChange(claim.claim_id, e.target.value)}
                                 style={{
@@ -271,6 +283,24 @@ export default function ReviewQueue() {
                             }}
                         >
                             Reject & Flag
+                        </button>
+
+                        <button
+                            onClick={() => handleAction(claim.claim_id, "send_for_relearning")}
+                            disabled={isSubmitting === claim.claim_id}
+                            style={{
+                                flex: 2,
+                                background: C.yellow,
+                                color: C.bg,
+                                border: "none",
+                                padding: "16px",
+                                borderRadius: 8,
+                                fontWeight: 800,
+                                cursor: isSubmitting === claim.claim_id ? "not-allowed" : "pointer",
+                                opacity: isSubmitting === claim.claim_id ? 0.7 : 1
+                            }}
+                        >
+                            Send for Relearning
                         </button>
 
                         <button

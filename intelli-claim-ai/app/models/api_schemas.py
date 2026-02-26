@@ -34,6 +34,7 @@ class ClaimSummary(BaseModel):
     risk_score: float = 0.0
     created_at: datetime | None = None
     summary: str | None = None
+    review_note: str | None = None
 
 
 class DashboardStats(BaseModel):
@@ -81,7 +82,7 @@ class ReviewerQueueResponse(BaseModel):
 
 
 class ReviewerDecisionRequest(BaseModel):
-    decision: Literal["approve", "reject", "request_more_info"]
+    decision: Literal["approve", "reject", "request_more_info", "send_for_relearning"]
     reviewer_name: str
     reviewer_email: str
     note: str | None = None

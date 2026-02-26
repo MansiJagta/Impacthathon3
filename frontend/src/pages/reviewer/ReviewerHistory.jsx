@@ -59,6 +59,21 @@ export default function ReviewerHistory() {
                         <p style={{ color: "#64748B", fontSize: 13 }}>
                             AI Recommendation: <span style={{ color: "#2563EB", fontWeight: 600 }}>{c.ai_decision || 'N/A'}</span> · {c.summary}
                         </p>
+                        {c.review_note && (
+                            <div style={{
+                                background: "rgba(245, 158, 11, 0.10)",
+                                border: "1px solid rgba(245, 158, 11, 0.30)",
+                                borderRadius: 8,
+                                padding: "10px 12px",
+                                color: C.text,
+                                fontSize: 12
+                            }}>
+                                <span style={{ color: C.yellow, fontWeight: 800 }}>
+                                    {c.status === "SENT_FOR_RELEARNING" ? "Relearning Reason:" : "Reviewer Note:"}
+                                </span>{" "}
+                                {c.review_note}
+                            </div>
+                        )}
                     </div>
                 )) : (
                     <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>No claims found.</div>
